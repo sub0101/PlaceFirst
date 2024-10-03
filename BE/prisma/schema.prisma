@@ -12,20 +12,31 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+model Auth {
+  id       String  @id @default(uuid()) 
+  user_id  String  @unique
+  email    String  @unique
+  password String
+  role     String  @default("Student") 
+}
 
 model Student {
-  id  String @id @default(uuid())
-  name String
-  email String @unique
-  contact String
-  enrollment String @unique
-  password String
+  id         String  @id @default(uuid()) 
+  name       String
+  contact    String?
+  studentId  String  @unique 
+  email      String  @unique
+  branch String?
+  course String?
+  department String?
+
 }
+
 model Admin {
-  id String @id @default(uuid())
-  name String 
-  email String @unique
-  registration_number String @unique
-  contact String 
-  password String
+  id       String  @id @default(uuid()) 
+  name     String
+  email    String  @unique
+  contact  String?
+  adminId  String  @unique 
+  position String ?
 }

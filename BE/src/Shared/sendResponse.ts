@@ -15,7 +15,7 @@ type ApiResponse<T> =  {
 
 const sendResponse = <T>(res:Response , data:ApiResponse<T> ) => {
 
-    res.status(data.statusCode).json(data)
+  return   res.status(data.statusCode).json(data)
 }
 
 export default sendResponse

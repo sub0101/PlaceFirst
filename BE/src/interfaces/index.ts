@@ -1,18 +1,19 @@
- export interface IStundent {
-    name:string
-    enrollment:string
-    contact:string
-    email:string
-    password:string
-    user_type:number
-}
+import exp from "constants"
 
-export interface IAdmin {
-    name :string 
-    registration_number:string 
-    contact:string
-    email:string
-    password:string
-    user_type:number
-    
+export  interface IUserResponse {
+    userId:string
+    token :string
+    role:string
 }
+export interface IUserSignUp {
+    name: string
+    userId :string
+    email :string 
+    password:string
+    role:string
+}
+export interface IJwtPayload {
+    userId:string
+    role:string
+    
+  }

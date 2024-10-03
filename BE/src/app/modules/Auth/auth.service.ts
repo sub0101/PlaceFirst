@@ -1,72 +1,98 @@
-import { Admin, Student } from "@prisma/client"
-import { IAdmin, IStundent } from "../../../interfaces"
+import { Admin, Auth, Student } from "@prisma/client"
 import prisma from "../../../Shared/prisma"
+import { IUserResponse, IUserSignUp } from "../../../interfaces"
 import { AuthHelper } from "./auth.helper"
 import { compare } from "bcrypt"
 import jwt from "jsonwebtoken"
+import env from "../../../config"
 import ApiError from "../../../Error/ApiError"
+import { hashPassword } from "../../../utils/bcrypt"
+import { userInfo } from "os"
+import { generateAceessToken } from "../../../utils/jwt"
 
-const login = async (payload: { email: string, password: string }) => {
-    const { email, password } = payload;
-    const student: Student | null = await prisma.student.findUnique({
+const login = async (payload: { userId: string, password: string }):Promise<IUserResponse> => {
+    const { userId, password } = payload;
+    console.log(payload)
+    const auth: Auth | null = await prisma.auth.findUnique({
         where: {
-            email: email
+            user_id: userId
         }
     });
-    if (student) {
-        const isPasswordValid = await compare(password, student.password);
-        if (!isPasswordValid) throw new ApiError(401, "Invalid email or password.");
+    if (!auth) throw new ApiError(401, "Invalid User Id")
+    console.log(auth)
+    const isPasswordValid = await compare(password, auth.password);
+    console.log(isPasswordValid)
+    if (!isPasswordValid) throw new ApiError(401, "Invalid  User Id or Password.");
 
-        const accessToken = jwt.sign(
-            {
-                userId: student.id,
-                isAdmin: false
-            },
-            process.env.ACCESS_TOKEN_SECRET || "secret"
-        );
-    } else {
-        const admin: Admin | null = await prisma.admin.findUnique({
-            where: {
-                email: email
-            }
-        });
-        if (admin) {
-            const isPasswordValid = await compare(password, admin.password);
-            if (!isPasswordValid) throw new ApiError(401, "Invalid email or password.");
 
-            const accessToken = jwt.sign(
-                {
-                    userId: admin.id,
-                    isAdmin: true
-                },
-                process.env.ACCESS_TOKEN_SECRET || "secret"
-            );
-        }
+    const accessToken = await generateAceessToken( {
+        userId: userId,
+        role: auth.role == "Admin" ? "Admin" : "Student"
+    })
+    console.log(accessToken)
+
+    const response :IUserResponse ={
+        userId:userId,
+        token:accessToken,
+        role:auth.role
     }
-}
-const signupStudent = async (payLoad: Student) => {
-    console.log(payLoad)
-    const { enrollment, email } = payLoad
-    AuthHelper.isEmailExist(email)
-    AuthHelper.isEnrollmentExist(email)
+    return response
 
-    const student = await prisma.student.create({
-        data: payLoad
-    })
-    console.log(student)
 
 
 }
-const signupAdmin = async (payload: Admin) => {
-    const { registration_number, email } = payload
-    await AuthHelper.isEmailExist(email)
-    await AuthHelper.isRegistraionNumberExist(registration_number)
+const signupStudent = async (payload: IUserSignUp) => {
 
-    const student = await prisma.admin.create({
-        data: payload
+    const { name, role, userId, email, password } = payload
+    await AuthHelper.isUserExist(userId, email)
+    const hpassword = await hashPassword(password);
+
+    const trasaction = prisma.$transaction(async (tx) => {
+
+        const auth = await tx.auth.create({
+            data: {
+                email: email,
+                user_id: userId,
+                password: hpassword,
+                role: role
+            }
+        })
+        const student = await tx.student.create({
+            data: {
+                name: name,
+                email: email,
+                studentId: userId,
+
+            }
+        })
+    })
+}
+const signupAdmin = async (payload: IUserSignUp) => {
+    const { name, role, userId, email, password } = payload
+    await AuthHelper.isUserExist(userId, email)
+    const hpassword = await hashPassword(password);
+    const trasaction = prisma.$transaction(async (tx) => {
+console.log(payload)
+        const auth = await tx.auth.create({
+            data: {
+                email: email,
+                user_id: userId,
+                password: hpassword,
+                role: role
+            }
+        })
+        const admin = await tx.admin.create({
+            data: {
+                name: name,
+                email: email,
+                adminId: userId,
+
+            }
+        })
+
     })
 
-    console.log(student)
+
 }
 export const AuthService = {
     login,

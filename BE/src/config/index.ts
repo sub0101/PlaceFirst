@@ -12,7 +12,8 @@ const envSchema = z.object({
     ACCESS_TOKEN_EXPIRE: z.string(),
     CLOUDINARY_NAME :z.string(),
     CLOUDINARY_SECRET_KEY:z.string(),
-    CLOUDINARY_KEY:z.string()
+    CLOUDINARY_KEY:z.string(),
+    ACCESS_TOKEN_SECRET:z.string()
 
 
 })
