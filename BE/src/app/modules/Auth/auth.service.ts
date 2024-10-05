@@ -72,7 +72,6 @@ const signupAdmin = async (payload: IUserSignUp) => {
     await AuthHelper.isUserExist(userId, email)
     const hpassword = await hashPassword(password);
     const trasaction = prisma.$transaction(async (tx) => {
-console.log(payload)
         const auth = await tx.auth.create({
             data: {
                 email: email,

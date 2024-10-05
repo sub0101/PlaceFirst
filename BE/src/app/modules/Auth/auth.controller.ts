@@ -29,7 +29,11 @@ const signupAdmin = catchAsync( async (req :Request , res:Response) =>{
 })
 const login = catchAsync( async (req:Request , res:Response) =>{
 const response:IUserResponse  = await AuthService.login(req.body)
-res.cookie('token', response.token, { httpOnly: true, secure: true});
+// res.cookie('token', response.token, {   httpOnly: true,
+//     secure: process.env.NODE_ENV === 'production',
+//     sameSite:'none' });
+
+// res.cookie('aa' , 'dffdf')
 
  sendResponse<IUserResponse>(res , {
     statusCode:200 , 

@@ -9,7 +9,7 @@ import {
   LogoutOutlined,
   PlusOutlined
 } from '@ant-design/icons';
-import { useNavigate, Route, Routes, useLocation } from 'react-router-dom';
+import { useNavigate, Route, Routes, useLocation, Outlet } from 'react-router-dom';
 import DashBoard from './DashBoard';
 import ManageCompanies from './ManageCompanies';
 import ViewStats from './ViewStats';
@@ -41,7 +41,7 @@ const AdminPage = () => {
           selectedKeys={[location.pathname]}
           onClick={({ key }) => navigate(key)}
         >
-          <Menu.Item key="/" icon={<HomeOutlined />}>
+          <Menu.Item key="/dash" icon={<HomeOutlined />}>
             Dashboard
           </Menu.Item>
           <Menu.Item key="/manage-companies" icon={<UserOutlined />}>
@@ -68,14 +68,8 @@ const AdminPage = () => {
         </Header>
         <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
           <div className="site-layout-background" style={{ padding: 24 }}>
-            <Routes>
-              <Route path="/" element={<DashBoard />} />
-              <Route path="/manage-companies" element={<ManageCompanies />} />
-              <Route path="/view-stats" element={<ViewStats />} />
-              <Route path="/manage-users" element={<ManageUsers />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/add-company" element={<AddCompanyPage />} />
-            </Routes>
+            <Outlet />
+           
           </div>
         </Content>
       </Layout>

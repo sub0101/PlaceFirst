@@ -17,3 +17,9 @@ export interface IJwtPayload {
     role:string
     
   }
+
+
+  export interface User {
+    id:string |undefined , 
+    role:string|undefined
+  } 
