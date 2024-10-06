@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { Form, Button, Typography } from 'antd';
 import CompanyDetailsForm from './forms/CompanyDetailsForm';
-import InternDetailsForm from './forms/InternDetailsForm';
 import DateDetailsForm from './forms/DateDetailsForm';
 import AdditionalDetailsForm from './forms/AdditionalDetailsForm';
-
+import JobDescriptionForm from './forms/JobDescriptionForm';
 
 const { Title } = Typography;
 
@@ -12,29 +11,38 @@ const AddCompanyPage = () => {
   const [form] = Form.useForm();
   const [currentStep, setCurrentStep] = useState(0);
 
+
   const steps = [
     { title: 'Company Details', component: <CompanyDetailsForm form={form} /> },
-    { title: 'Intern Details', component: <InternDetailsForm form={form} /> },
+    { title: 'Job Description', component: <JobDescriptionForm form={form} /> },
     { title: 'Date Details', component: <DateDetailsForm form={form} /> },
     { title: 'Additional Details', component: <AdditionalDetailsForm form={form} /> },
   ];
-
-  const next = () => {
+  const [formName  ,setFormaName] = useState(steps[0].title)
+  const next =async() => {
+  
+  try {
+    // await form.validateFields();
     setCurrentStep(currentStep + 1);
+    setFormaName(steps[currentStep+1].title)
+  } catch (error) {
+    console.log("Validation failed");
+  }
   };
 
   const prev = () => {
     setCurrentStep(currentStep - 1);
+    setFormaName(steps[currentStep-1].title)
   };
 
   const handleAddCompany = (values) => {
     console.log('Received values:', values);
-    // You can add your logic to add the new company to the data source here
+
   };
 
   return (
     <div className="container mx-auto p-4">
-      <Title level={2}>Add New Company</Title>
+      <Title level={2}> {formName}</Title>
       <Form form={form} onFinish={handleAddCompany} layout="vertical">
         <div className="transition transform duration-500">
           {steps[currentStep].component}
