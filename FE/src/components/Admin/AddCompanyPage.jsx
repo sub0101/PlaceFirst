@@ -4,39 +4,78 @@ import CompanyDetailsForm from './forms/CompanyDetailsForm';
 import DateDetailsForm from './forms/DateDetailsForm';
 import AdditionalDetailsForm from './forms/AdditionalDetailsForm';
 import JobDescriptionForm from './forms/JobDescriptionForm';
-
+import { addCompany } from '../../react query/api/company';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 const { Title } = Typography;
 
 const AddCompanyPage = () => {
   const [form] = Form.useForm();
   const [currentStep, setCurrentStep] = useState(0);
-
+  const [companyDetails , setCompanyDetail] = useState({})
+  const [jobDescription , setJobDescription] = useState({})
+  const [dateDetails , setdateDetails] = useState({})
+  const [additionData  ,setAdditionalData] = useState({})
 
   const steps = [
-    { title: 'Company Details', component: <CompanyDetailsForm form={form} /> },
-    { title: 'Job Description', component: <JobDescriptionForm form={form} /> },
-    { title: 'Date Details', component: <DateDetailsForm form={form} /> },
-    { title: 'Additional Details', component: <AdditionalDetailsForm form={form} /> },
+    { title: 'Company Details', component: <CompanyDetailsForm  /> },
+    { title: 'Job Description', component: <JobDescriptionForm /> },
+    { title: 'Date Details', component: <DateDetailsForm  /> },
+    { title: 'Additional Details', component: <AdditionalDetailsForm /> },
   ];
   const [formName  ,setFormaName] = useState(steps[0].title)
   const next =async() => {
   
   try {
-    // await form.validateFields();
+
+    const values = await form.validateFields();
+
+    if (currentStep === 0) {  
+      setCompanyDetail(values);
+    } else if (currentStep === 1) {
+      setJobDescription(values);
+    } else if (currentStep === 2) {
+      setdateDetails(values);
+    } else if (currentStep === 3) {
+      setAdditionalData(values);
+    }
+
     setCurrentStep(currentStep + 1);
     setFormaName(steps[currentStep+1].title)
+
+console.log(values)
+
   } catch (error) {
+  
     console.log("Validation failed");
   }
   };
 
+  const  addCompanyMutation = useMutation( { mutationFn:addCompany ,
+
+    onSuccess : (data)=>{
+      console.log(data)
+      form.resetFields()
+      toast.success("Successfully Added")
+    },
+    onError:(err)=>{
+      console.log(err.message)
+      toast.error(err)
+    }
+  })
   const prev = () => {
     setCurrentStep(currentStep - 1);
     setFormaName(steps[currentStep-1].title)
   };
 
   const handleAddCompany = (values) => {
-    console.log('Received values:', values);
+  
+    setAdditionalData(values)
+const companyApplication = {...jobDescription , ...dateDetails , ...additionData}
+    const data = {
+    companyDetails , companyApplication 
+    }
+    addCompanyMutation.mutate(data)
 
   };
 

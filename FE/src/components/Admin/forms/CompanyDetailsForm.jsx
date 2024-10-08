@@ -1,16 +1,14 @@
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Form, Input, Button, Row, Col, message } from 'antd';
+import { Form, Input, Button, Row, Col, message, DatePicker,Select } from 'antd';
 
-const CompanyDetailsForm = ({ onNext }) => {
+const CompanyDetailsForm = () => {
   const { handleSubmit, control, formState: { errors } } = useForm();
 
-  const onSubmit = data => {
-    onNext(data);
-  };
+
 
   return (
-    <Form
+    <div
       layout="vertical" 
       style={{
         padding: '24px',
@@ -18,11 +16,12 @@ const CompanyDetailsForm = ({ onNext }) => {
         borderRadius: '8px',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
       }}
-      onFinish={handleSubmit(onSubmit)}
+     
     >
       <Row gutter={[16, 16]}>
         <Col span={12}>
           <Form.Item
+          name="name"
             label="Company Name"
             validateStatus={errors.company ? 'error' : ''}
             help={errors.company?.message}
@@ -33,6 +32,7 @@ const CompanyDetailsForm = ({ onNext }) => {
         </Col>
         <Col span={12}>
           <Form.Item
+          name="location"
             label="Location"
             validateStatus={errors.location ? 'error' : ''}
             help={errors.location?.message}
@@ -46,6 +46,7 @@ const CompanyDetailsForm = ({ onNext }) => {
       <Row gutter={[16, 16]}>
         <Col span={12}>
           <Form.Item
+                    name="industry"
             label="Industry"
             validateStatus={errors.industry ? 'error' : ''}
             help={errors.industry?.message}
@@ -56,6 +57,7 @@ const CompanyDetailsForm = ({ onNext }) => {
         </Col>
         <Col span={12}>
           <Form.Item
+          name="contactPerson"
             label="Contact Person"
             validateStatus={errors.contactPerson ? 'error' : ''}
             help={errors.contactPerson?.message}
@@ -69,6 +71,7 @@ const CompanyDetailsForm = ({ onNext }) => {
       <Row gutter={[16, 16]}>
         <Col span={12}>
           <Form.Item
+          name="contactEmail"
             label="Contact Email"
             validateStatus={errors.contactEmail ? 'error' : ''}
             help={errors.contactEmail?.message}
@@ -82,6 +85,7 @@ const CompanyDetailsForm = ({ onNext }) => {
         </Col>
         <Col span={12}>
           <Form.Item
+          name="contactPhone"
             label="Contact Phone"
             validateStatus={errors.contactPhone ? 'error' : ''}
             help={errors.contactPhone?.message}
@@ -98,17 +102,35 @@ const CompanyDetailsForm = ({ onNext }) => {
       <Row gutter={[16, 16]}>
         <Col span={12}>
           <Form.Item
+          name="visitDate"
             label="Visit Date"
             validateStatus={errors.visitDate ? 'error' : ''}
             help={errors.visitDate?.message}
             rules={[{ required: true, message: 'Please enter the visit date' }]}
           >
-            <Input placeholder="Enter visit date" />
+           <DatePicker />
+          </Form.Item>
+        
+        </Col>
+        <Col span={6} >
+        <Form.Item
+          name="status"
+            label="Current Status"
+            validateStatus={errors.visitDate ? 'error' : ''}
+            help={errors.visitDate?.message}
+            rules={[{ required: true, message: 'Please enter Status' }]}
+          >
+          <Select mode="single">
+        <Option value="ongoing">Ongoing</Option>
+        <Option value="upcoming">Upcoming</Option>
+        <Option value="completed">Completed</Option>
+  
+      </Select>
           </Form.Item>
         </Col>
       </Row>
 
-    </Form>
+    </div>
   );
 };
 

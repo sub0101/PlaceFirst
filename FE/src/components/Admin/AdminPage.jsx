@@ -24,7 +24,7 @@ const AdminPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogout = () => {  
     loggedOut();
     navigate("/login");
   };
@@ -41,22 +41,22 @@ const AdminPage = () => {
           selectedKeys={[location.pathname]}
           onClick={({ key }) => navigate(key)}
         >
-          <Menu.Item key="/dash" icon={<HomeOutlined />}>
+          <Menu.Item key="/admin/dash" icon={<HomeOutlined />}>
             Dashboard
           </Menu.Item>
-          <Menu.Item key="/manage-companies" icon={<UserOutlined />}>
+          <Menu.Item key="/admin/manage-companies" icon={<UserOutlined />}>
             Manage Companies
           </Menu.Item>
-          <Menu.Item key="/view-stats" icon={<FileDoneOutlined />}>
+          <Menu.Item key="/admin/view-stats" icon={<FileDoneOutlined />}>
             View Stats
           </Menu.Item>
-          <Menu.Item key="/manage-users" icon={<CheckCircleOutlined />}>
+          <Menu.Item key="/admin/manage-users" icon={<CheckCircleOutlined />}>
             Manage Users
           </Menu.Item>
-          <Menu.Item key="/profile" icon={<ProfileOutlined />}>
+          <Menu.Item key="/admin/profile" icon={<ProfileOutlined />}>
             Profile
           </Menu.Item>
-          <Menu.Item key="/add-company" icon={<PlusOutlined />}>
+          <Menu.Item key="/admin/add-company" icon={<PlusOutlined />}>
             Add New Company
           </Menu.Item>
         </Menu>

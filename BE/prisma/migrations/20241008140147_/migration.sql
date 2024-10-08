@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "CompanyApplication" ALTER COLUMN "ctc" SET DATA TYPE TEXT,
+ALTER COLUMN "stipend" SET DATA TYPE TEXT;

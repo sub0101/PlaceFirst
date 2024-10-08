@@ -12,7 +12,7 @@ const AdditionalDetailsForm = ({ form }) => (
         <Option value="standard">Standard</Option>
       </Select>
     </Form.Item>
-    <Form.Item name="branches" label="Branches Allowed" rules={[{ required: true, message: 'Please select the branches' }]}>
+    <Form.Item name="allowedBranches" label="Courses Allowed" rules={[{ required: true, message: 'Please select the Courses' }]}>
       <Select mode="multiple">
         <Option value="btech">B.Tech</Option>
         <Option value="mca">MCA</Option>
@@ -20,7 +20,15 @@ const AdditionalDetailsForm = ({ form }) => (
         <Option value="msc">M.Sc</Option>
       </Select>
     </Form.Item>
-    <Form.Item name="role" label="Role Provided" rules={[{ required: true, message: 'Please enter the role' }]}>
+    <Form.Item name="allowedCourses" label="Branches Allowed" rules={[{ required: true, message: 'Please select the branches' }]}>
+      <Select mode="multiple">
+        <Option value="cse">CSE</Option>
+        <Option value="mca">MCA</Option>
+        <Option value="ece">ECE</Option>
+        <Option value="ei">EI</Option>
+      </Select>
+    </Form.Item>
+    <Form.Item name="selectionProcess" label="Selection Process" rules={[{ required: true, message: 'Please enter the role' }]}>
       <Input />
     </Form.Item>
   </>

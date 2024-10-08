@@ -1,19 +1,47 @@
 import React from "react";
 import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom";
-import { login } from "../../utils/auth/userLogin";
+import { login } from "../../react query/api/auth";
+import { useMutation } from "@tanstack/react-query";
+import { toast ,ToastContainer } from "react-toastify";
+import { Spin } from "antd";  
+
+// Import toastify css file
+import "react-toastify/dist/ReactToastify.css";
+import { setUserInfo } from "../../utils/localStorage";
+
+
+
+
 function Login() {
+  const [loading, setLoading] = React.useState(false);
   const { register, handleSubmit,watch } = useForm()
 const naviagate = useNavigate()
   const onSubmit= async (data) => {
-    console.log(data)
-   const info  =   await login(data)
-   console.log(info)
-info && naviagate("/")
+    setLoading(true)
+    mutation.mutate(data)
   }
+  const mutation = useMutation({ mutationFn: login,   
+    onSuccess: (data, variables, context) => {
+          setLoading(false)
+        setUserInfo(data.token)
+    toast.success("Successfully login")
+    data.role ==="Admin" ? naviagate("/admin"):naviagate("/");
+    },
+    onError: (error, variables, context) => {
+ console.log(error.response.data.message)
+ toast.error(error.response.data.message)
+    },
+    onSettled: (data, error, variables, context) => {
+    },
+  });
 
     return (
+  
         <div className="flex items-center justify-center h-screen w-full px-5 sm:px-0">
+          {
+            // mutation.isSuccess ? console.log('dfd'): console.log('ca')
+          }
           <div className="flex bg-white rounded-lg shadow-lg border overflow-hidden max-w-sm lg:max-w-4xl w-full">
             <div
               className="hidden md:block lg:w-1/2 bg-cover bg-blue-700"
@@ -53,7 +81,7 @@ info && naviagate("/")
               </div>
               <div className="mt-8">
                 <button type="submit" className="bg-blue-700 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600">
-                  Login
+               {loading? <Spin pinning={loading}  /> : 'Login' }
                 </button>
               </div>
               </form>

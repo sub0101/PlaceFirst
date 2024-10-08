@@ -6,7 +6,7 @@ function PrivateOutlet() {
     const navigate = useNavigate()
 
     useEffect(()=>{
-    
+        console.log("private outlet")
         !isLogin && navigate('/login')
    
     } , [])

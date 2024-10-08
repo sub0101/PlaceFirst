@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { Layout, Menu, Card, Button, Typography, Select } from 'antd';
+import { Layout, Menu, Card, Button, Typography, Select, Row, Col, Space } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { loggedOut } from '../../utils/auth/getUserInfo';
 import {
   HomeOutlined,
+  LogoutOutlined,
   UserOutlined,
   FileDoneOutlined,
   CheckCircleOutlined,
@@ -12,10 +15,16 @@ const { Header, Sider, Content } = Layout;
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
 
-const S_DashBoard= () => {
+const S_DashBoard = () => {
   const [selectedKey, setSelectedKey] = useState('1');
   const [filter, setFilter] = useState('all');
   const [username] = useState('John Doe'); // Simulate logged-in user
+  const navigate = useNavigate();
+
+  const handleLogout = () => {  
+    loggedOut();
+    navigate("/login");
+  };
 
   const renderContent = () => {
     switch (selectedKey) {
@@ -28,74 +37,94 @@ const S_DashBoard= () => {
               <Paragraph>Don't forget to apply for upcoming placements!</Paragraph>
               <Paragraph>Workshop on interview skills next week. Sign up now!</Paragraph>
             </Card>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Card className="mb-4" hoverable>
-                <Title level={4}>My Applications</Title>
-                <Button type="primary" block>View Applications</Button>
-              </Card>
-              <Card className="mb-4" hoverable>
-                <Title level={4}>Upcoming Interviews</Title>
-                <Button type="primary" block>Check Schedule</Button>
-              </Card>
-              <Card className="mb-4" hoverable>
-                <Title level={4}>Resume Tips</Title>
-                <Button type="primary" block>Learn More</Button>
-              </Card>
-            </div>
+            <Row gutter={[16, 16]}>
+              <Col xs={24} md={12} lg={8}>
+                <Card hoverable>
+                  <Title level={4}>My Applications</Title>
+                  <Button type="primary" block>View Applications</Button>
+                </Card>
+              </Col>
+              <Col xs={24} md={12} lg={8}>
+                <Card hoverable>
+                  <Title level={4}>Upcoming Interviews</Title>
+                  <Button type="primary" block>Check Schedule</Button>
+                </Card>
+              </Col>
+              <Col xs={24} md={12} lg={8}>
+                <Card hoverable>
+                  <Title level={4}>Resume Tips</Title>
+                  <Button type="primary" block>Learn More</Button>
+                </Card>
+              </Col>
+            </Row>
           </>
         );
       case '2':
         return (
           <>
             <Title level={2}>Companies</Title>
-            <Select defaultValue="all" style={{ width: 200 }} onChange={(value) => setFilter(value)}>
-              <Option value="all">All</Option>
-              <Option value="upcoming">Upcoming</Option>
-              <Option value="ongoing">Ongoing</Option>
-              <Option value="completed">Completed</Option>
-            </Select>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-              {(filter === 'all' || filter === 'upcoming') && (
-                <>
-                  <Card title="INFOSYS" extra={<Button type="primary">UPCOMING</Button>} className="mb-4">
-                    <p>Type: SERVICE based</p>
-                    <p>CTC: 70000</p>
-                    <p>Date: 02 Feb 2022</p>
-                    <p>3 students have Applied</p>
-                  </Card>
-                  <Card title="AMAZON" extra={<Button type="primary">UPCOMING</Button>}>
-                    <p>Type: PRODUCT based</p>
-                    <p>CTC: 100000000</p>
-                    <p>Date: 18 Jun 2023</p>
-                    <p>1 student has Applied</p>
-                  </Card>
-                </>
-              )}
-              {(filter === 'all' || filter === 'ongoing') && (
-                <>
-                  <Card title="Google" extra={<Button type="primary">Applied</Button>} className="mb-4">
-                    <p>Type: PRODUCT</p>
-                    <p>CTC: 100000</p>
-                  </Card>
-                  <Card title="Microsoft" extra={<Button type="primary">Applied</Button>} className="mb-4">
-                    <p>Type: PRODUCT</p>
-                    <p>CTC: 100000</p>
-                  </Card>
-                </>
-              )}
-              {(filter === 'all' || filter === 'completed') && (
-                <>
-                  <Card title="Google" extra={<Button type="primary">Placed</Button>} className="mb-4">
-                    <p>Type: PRODUCT</p>
-                    <p>CTC: 100000</p>
-                  </Card>
-                  <Card title="Microsoft" extra={<Button type="primary">Placed</Button>} className="mb-4">
-                    <p>Type: PRODUCT</p>
-                    <p>CTC: 100000</p>
-                  </Card>
-                </>
-              )}
-            </div>
+            <Space direction="vertical" size="large" style={{ width: '100%' }}>
+              <Select defaultValue="all" style={{ width: 200 }} onChange={(value) => setFilter(value)}>
+                <Option value="all">All</Option>
+                <Option value="upcoming">Upcoming</Option>
+                <Option value="ongoing">Ongoing</Option>
+                <Option value="completed">Completed</Option>
+              </Select>
+              <Row gutter={[16, 16]}>
+                {(filter === 'all' || filter === 'upcoming') && (
+                  <>
+                    <Col xs={24} md={12} lg={8}>
+                      <Card title="INFOSYS" extra={<Button type="primary">UPCOMING</Button>}>
+                        <p>Type: SERVICE based</p>
+                        <p>CTC: 70000</p>
+                        <p>Date: 02 Feb 2022</p>
+                        <p>3 students have Applied</p>
+                      </Card>
+                    </Col>
+                    <Col xs={24} md={12} lg={8}>
+                      <Card title="AMAZON" extra={<Button type="primary">UPCOMING</Button>}>
+                        <p>Type: PRODUCT based</p>
+                        <p>CTC: 100000000</p>
+                        <p>Date: 18 Jun 2023</p>
+                        <p>1 student has Applied</p>
+                      </Card>
+                    </Col>
+                  </>
+                )}
+                {(filter === 'all' || filter === 'ongoing') && (
+                  <>
+                    <Col xs={24} md={12} lg={8}>
+                      <Card title="Google" extra={<Button type="primary">Applied</Button>}>
+                        <p>Type: PRODUCT</p>
+                        <p>CTC: 100000</p>
+                      </Card>
+                    </Col>
+                    <Col xs={24} md={12} lg={8}>
+                      <Card title="Microsoft" extra={<Button type="primary">Applied</Button>}>
+                        <p>Type: PRODUCT</p>
+                        <p>CTC: 100000</p>
+                      </Card>
+                    </Col>
+                  </>
+                )}
+                {(filter === 'all' || filter === 'completed') && (
+                  <>
+                    <Col xs={24} md={12} lg={8}>
+                      <Card title="Google" extra={<Button type="primary">Placed</Button>}>
+                        <p>Type: PRODUCT</p>
+                        <p>CTC: 100000</p>
+                      </Card>
+                    </Col>
+                    <Col xs={24} md={12} lg={8}>
+                      <Card title="Microsoft" extra={<Button type="primary">Placed</Button>}>
+                        <p>Type: PRODUCT</p>
+                        <p>CTC: 100000</p>
+                      </Card>
+                    </Col>
+                  </>
+                )}
+              </Row>
+            </Space>
           </>
         );
       case '3':
@@ -109,15 +138,21 @@ const S_DashBoard= () => {
       case '7':
         return (
           <div>
-            <h2 className="text-xl font-bold mb-4">My Applications</h2>
-            <Card title="Google" extra={<Button type="primary">View Details</Button>} className="mb-4">
-              <p>Status: Applied</p>
-              <p>Interview Date: 25th Oct 2024</p>
-            </Card>
-            <Card title="Microsoft" extra={<Button type="primary">View Details</Button>} className="mb-4">
-              <p>Status: Interview Scheduled</p>
-              <p>Interview Date: 30th Oct 2024</p>
-            </Card>
+            <Title level={2}>My Applications</Title>
+            <Row gutter={[16, 16]}>
+              <Col xs={24} md={12}>
+                <Card title="Google" extra={<Button type="primary">View Details</Button>}>
+                  <p>Status: Applied</p>
+                  <p>Interview Date: 25th Oct 2024</p>
+                </Card>
+              </Col>
+              <Col xs={24} md={12}>
+                <Card title="Microsoft" extra={<Button type="primary">View Details</Button>}>
+                  <p>Status: Interview Scheduled</p>
+                  <p>Interview Date: 30th Oct 2024</p>
+                </Card>
+              </Col>
+            </Row>
           </div>
         );
       default:
@@ -127,7 +162,7 @@ const S_DashBoard= () => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider width={200} className="site-layout-background">
+      <Sider width={250} className="site-layout-background">
         <div className="logo" style={{ color: 'white', padding: '16px', textAlign: 'center', fontSize: '24px' }}>
           PLACEMENT PORTAL
         </div>
@@ -162,13 +197,24 @@ const S_DashBoard= () => {
         </Menu>
       </Sider>
       <Layout>
-        <Header className="site-layout-background" style={{ padding: 0, background: '#001529', color: 'white', textAlign: 'center', fontSize: '24px' }}>
-          WELCOME TO PLACEMENT PORTAL
+        <Header
+          className="site-layout-background"
+          style={{
+            padding: '0 24px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            background: '#001529',
+            color: 'white',
+          }}
+        >
+          <Title level={3} style={{ color: 'white', margin: 0 }}>WELCOME TO PLACEMENT PORTAL</Title>
+          <Button type="primary" icon={<LogoutOutlined />} onClick={handleLogout}>
+            Logout
+          </Button>
         </Header>
-        <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
-          <div className="site-layout-background" style={{ padding: 24 }}>
-            {renderContent()}
-          </div>
+        <Content style={{ margin: '24px 16px', padding: 24, background: '#fff' }}>
+          {renderContent()}
         </Content>
       </Layout>
     </Layout>

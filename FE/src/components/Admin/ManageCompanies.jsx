@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { Typography, Select, Table, Button } from 'antd';
 import { EditOutlined, CheckCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
-
+import { Link, replace } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 const { Title } = Typography;
 const { Option } = Select;
 
 const ManageCompanies = () => {
   const [filter, setFilter] = useState('all');
-
+  const navigate = useNavigate()
+const navigateToEdit = ( ) =>{
+navigate("./edit")
+}
   const columns = [
     { title: 'Company', dataIndex: 'company', key: 'company' },
     { title: 'Status', dataIndex: 'status', key: 'status' },
@@ -19,7 +22,7 @@ const ManageCompanies = () => {
       key: 'actions',
       render: (text, record) => (
         <>
-          <Button icon={<EditOutlined />} style={{ marginRight: '10px' }}>Edit</Button>
+          <Button onClick={navigateToEdit} icon={<EditOutlined />} style={{ marginRight: '10px' }}>Edit</Button>
           <Button icon={<CheckCircleOutlined />}>Update Status</Button>
         </>
       ),

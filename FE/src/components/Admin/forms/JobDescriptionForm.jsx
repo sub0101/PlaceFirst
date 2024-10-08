@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Input, Checkbox, Row, Col } from 'antd';
+import { Form, Input, Checkbox, Row, Col, InputNumber } from 'antd';
 
 const JobDescriptionForm = ({ form }) => {
   const [isInternPpo, setIsInternPpo] = useState(false);
@@ -28,9 +28,9 @@ const JobDescriptionForm = ({ form }) => {
         </Col>
         <Col span={12}>
           <Form.Item
-            name="typeOfHiring"
-            label="Type of Hiring"
-            rules={[{ required: true, message: 'Please enter the type of hiring' }]}
+            name="recruitmentMode"
+            label="Recruitement Mode"
+            rules={[{ required: true, message: 'Please enter the Recruitment Mode' }]}
           >
             <Input style={inputStyle} placeholder="Enter type of hiring" />
           </Form.Item>
@@ -78,7 +78,7 @@ const JobDescriptionForm = ({ form }) => {
 
           <Col span={12}>
           <Form.Item
-            name="durationOfInternship"
+            name="internshipDuration"
             label="Duration of Internship"
             rules={[{ required: true, message: 'Please enter the Duration' }]}
           >
@@ -115,7 +115,7 @@ const JobDescriptionForm = ({ form }) => {
         label="Open Roles"
         rules={[{ required: true, message: 'Please enter the number of open roles' }]}
       >
-        <Input style={inputStyle} placeholder="Enter number of open roles" />
+        <InputNumber  style={inputStyle} placeholder="Enter number of open roles" />
       </Form.Item>
         </Col>
       </Row>

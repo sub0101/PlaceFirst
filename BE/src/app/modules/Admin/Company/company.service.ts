@@ -9,13 +9,13 @@ import ApiError from "../../../../Error/ApiError"
 const addCompany = async ( user:User | undefined , payload:any):Promise<any|undefined> => {
     if(!user) throw new ApiError(401 , "user Does not exist")
         console.log(payload)
-    const {company , companyApplication} = payload
+    const {companyDetails:company , companyApplication} = payload
 
     const admin = prisma.admin.findUnique({
         where:{id:user.id}
     })
-
-    const result  = prisma.company.create({
+// console.log()
+    const result  = await prisma.company.create({
         data:{
             ...company,
             companyApplication:{

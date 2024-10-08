@@ -3,7 +3,7 @@ import { isLoggedIn } from '../../utils/auth/getUserInfo';
 
 export const ProtectedLogin = ({ children }) => {
   if (isLoggedIn()) {
-    return <Navigate to="/dash" replace />; // Redirect to dashboard or home
+    return <Navigate to="/" replace />; // Redirect to dashboard or home
   }
   return children; // Otherwise, render the login page
 };

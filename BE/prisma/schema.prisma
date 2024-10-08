@@ -52,6 +52,7 @@ model Company {
   contactEmail       String              @unique
   contactPhone       String              @unique
   visitDate          String
+  status String?
   addedAt            DateTime            @default(now())
   companyApplication CompanyApplication?
   createdAt          DateTime            @default(now())
@@ -65,16 +66,21 @@ model CompanyApplication {
   eligibilityCriteria  String?
   studentsSelected     Int         @default(0)
   jobTitle             String
-  typeOfHiring         String
   jobDescription       String
-  ctc                  Float?
-  stipend              Float?
+  ctc                  String?
+  stipend              String?
   recruitmentMode      String
-  durationOfInternship String?
+  internshipDuration String?
   bondPeriod           String?
   openRoles            Int
   selectionProcess     String
   applicants           Applicant[]
+  interviewDate String?
+  pptDate String?
+  assessmentDate String?
+  tier String?
+  allowedCourses String[]
+  allowedBranches String[]
   createdAt            DateTime    @default(now())
   updatedAt            DateTime    @updatedAt
 }

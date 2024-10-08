@@ -1,7 +1,17 @@
 import axios from "axios";
 import { getAccessToken } from "../utils/auth/getUserInfo";
 const BASE_URL = import.meta.env.VITE_BASE_URL
-export const instance = axios.create({
+
+
+export const unAuthAxios = axios.create({
+    baseURL:BASE_URL,
+    headers: {
+        'Content-Type': 'application/json', // Set default headers for all requests
+    },
+    withCredentials: true
+})
+
+export const authAxios= axios.create({
     baseURL: BASE_URL,
     headers: {
         'Content-Type': 'application/json', // Set default headers for all requests
@@ -9,7 +19,7 @@ export const instance = axios.create({
     withCredentials: true
 })
 
-axiosPrivate.interceptors.request.use(
+authAxios.interceptors.request.use(
     config => {
         const accessToken = getAccessToken();
         if (accessToken) {
@@ -19,7 +29,7 @@ axiosPrivate.interceptors.request.use(
     }, (error) => Promise.reject(error)
 );
 
-axiosPrivate.interceptors.response.use(
+authAxios.interceptors.response.use(
     response => response,
     async (error) => {
         const prev_req = error?.config;
