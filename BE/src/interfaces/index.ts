@@ -10,7 +10,8 @@ export interface IUserSignUp {
     userId :string
     email :string 
     password:string
-    role:string
+    confirmPassword:string
+    contact:string
 }
 export interface IJwtPayload {
     userId:string

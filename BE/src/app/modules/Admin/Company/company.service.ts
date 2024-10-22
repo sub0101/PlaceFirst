@@ -33,7 +33,24 @@ const addCompany = async ( user:User | undefined , payload:any):Promise<any|unde
    return result;
 
 }
-const getAllCompanies = async () => {
+const getAllCompanies = async (user:any):Promise<Company[]> => {
+    console.log("getting")
+    const data = await prisma.company.findMany({
+        include:{
+            companyApplication:{
+                include:{
+                    applicants:{
+                       select:{
+                        id:true
+                       }
+                    }
+                }
+            }
+        }
+    })
+
+    return data
+
 
 }
 const getCompanyDetails = async () => { }
@@ -42,10 +59,39 @@ const updateCompany = async () => {
 
 }
 
+const getAllApplications = async()=>{
+const data:any = await prisma.company.findMany({
+    select:{
+        name:true,
+        industry:true,
+        visitDate:true,
+        status:true,
+        location:true,
+      companyApplication:{
+        include:{
+        
+            applicants:{
+                select:{
+                    studentId:true
+                }
+            }
+        }
+      }
+    },
+})
+
+// const details  ={...(data.companyApplication) }
+// // const details = 
+// console.log(details)
+// console.log(data)
+// console.log(data.name)
+return data
+}
 
 export const CompanyService = {
     addCompany,
     getAllCompanies, 
     getCompanyDetails,
-     updateCompany
+     updateCompany,
+     getAllApplications
 }

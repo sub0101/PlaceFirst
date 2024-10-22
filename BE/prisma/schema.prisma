@@ -23,6 +23,7 @@ model Auth {
 
 model Student {
   id         String      @id @default(uuid())
+  image String ?
   name       String
   contact    String?
   studentId  String      @unique
@@ -30,8 +31,11 @@ model Student {
   branch     String?
   course     String?
   department String?
+  debarred Boolean ? @default(false)
   applicant  Applicant[]
+  education Education[]
 }
+
 
 model Admin {
   id       String  @id @default(uuid())
@@ -63,24 +67,24 @@ model CompanyApplication {
   id                   String      @id @default(uuid())
   companyId            String      @unique
   company              Company     @relation(fields: [companyId], references: [id])
-  eligibilityCriteria  String?
-  studentsSelected     Int         @default(0)
-  jobTitle             String
-  jobDescription       String
-  ctc                  String?
-  stipend              String?
-  recruitmentMode      String
-  internshipDuration String?
-  bondPeriod           String?
-  openRoles            Int
-  selectionProcess     String
-  applicants           Applicant[]
-  interviewDate String?
-  pptDate String?
-  assessmentDate String?
-  tier String?
-  allowedCourses String[]
-  allowedBranches String[]
+    eligibilityCriteria  String?
+    studentsSelected     Int         @default(0)
+    jobTitle             String
+    jobDescription       String
+    ctc                  String?
+    stipend              String?
+    recruitmentMode      String
+    internshipDuration String?
+    bondPeriod           String?
+    openRoles            Int
+    selectionProcess     String
+    applicants           Applicant[]
+    interviewDate String?
+    pptDate String?
+    assessmentDate String?
+    tier String?
+    allowedCourses String[]
+    allowedBranches String[]
   createdAt            DateTime    @default(now())
   updatedAt            DateTime    @updatedAt
 }
@@ -91,9 +95,22 @@ model Applicant {
   Student              Student            @relation(fields: [studentId], references: [id])
   companyApplicationId String
   CompanyApplication   CompanyApplication @relation(fields: [companyApplicationId], references: [id])
-  status               String // e.g., Applied, Shortlisted, Interviewed, Rejected, Selected
+  backlog Boolean ? @default(false)
+  cgpa Int?
+  precentage Int?
   resumeUrl            String?
+  status               String? @default("pending")
   appliedAt            DateTime           @default(now())
-
   updatedAt DateTime @updatedAt
+}
+
+model Education {
+  id Int @id @default(autoincrement())
+  studentId String
+  student Student @relation(fields: [studentId] , references: [id])
+  degree String
+  year String
+  institution String
+  currentEducation Boolean?
+
 }

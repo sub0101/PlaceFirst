@@ -11,7 +11,7 @@ export const app = express();
 app.use(cors({origin:"http://localhost:5173" ,
     optionsSuccessStatus: 200,
     preflightContinue: false,
-    methods: "GET,POST,OPTIONS",
+    methods: "GET,POST,OPTIONS,PATCH",
     credentials: true}))
 app.use(express.json())
 app.use(urlencoded({extended:true}))
@@ -21,7 +21,8 @@ app.use(cookieParser())
 
 
 app.use( ( err:any  , req:Request , res:Response , next:NextFunction) =>{
-   
+   console.log("error detections")
+ 
     if(err instanceof ApiError) {
         console.log(err)
         return  res.status(err.statusCode).json({success:false  , message: err.message})

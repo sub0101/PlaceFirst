@@ -4,17 +4,34 @@ import { catchAsync } from "../../../../utils/ayncError"
 import { Request , Response } from "express"
 import sendResponse from "../../../../Shared/sendResponse"
 import { CompanyService } from "./company.service"
-import { CompanyApplication } from "@prisma/client"
+import { Company, CompanyApplication } from "@prisma/client"
 
 const getAllCompanies= catchAsync(async (req , res) =>{
 
+    const response:Company[] = await CompanyService.getAllCompanies(req.user)
+ 
+    return sendResponse<Company[]> ( res , {
+        statusCode:200 , 
+        success: true,
+        message: "sucess",
+        data: response
+    })
+
 })
 
+const getAllApplications = catchAsync(async(req:Request , res:Response) =>{
+    const response = await CompanyService.getAllApplications()
+    sendResponse<any>(res , {
+        statusCode:httpStatus.OK,
+        success:true,
+        message:"Successfully Fetched Company Application",
+        data:response
+    })
+})
 const addCompany= catchAsync(async (req , res) =>{
-    console.log("in addd")
-const user  = req.user
-console.log(user)
-    const response:any = await CompanyService.addCompany( user , req.body)
+
+    const response:any = await CompanyService.addCompany( req.user , req.body)
+    
     return sendResponse<any> ( res , {
         statusCode:200 , 
         success: true,
@@ -27,5 +44,6 @@ console.log(user)
 
 export const CompanyController = {
     getAllCompanies,
-    addCompany
+    addCompany,
+    getAllApplications
 }

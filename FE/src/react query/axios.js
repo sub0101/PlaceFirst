@@ -31,11 +31,11 @@ authAxios.interceptors.request.use(
 
 authAxios.interceptors.response.use(
     response => response,
-    async (error) => {
-        const prev_req = error?.config;
-        console.log("error occured")
-        if (error?.response?.status == 404) {
+    // async (error) => {
+    //     const prev_req = error?.config;
+    //     console.log("error occured")
+    //     if (error?.response?.status == 404) {
 
-        }
-    }
+    //     }
+    // }
 )

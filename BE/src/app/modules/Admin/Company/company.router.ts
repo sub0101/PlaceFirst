@@ -8,5 +8,6 @@ const router = express.Router()
 
 router.get("/" ,isAuth(AuthUser.ADMIN),  CompanyController.getAllCompanies)
 router.post("/" , isAuth(AuthUser.ADMIN) , CompanyController.addCompany)
+router.get("/applications" ,isAuth(AuthUser.STUDENT) , CompanyController.getAllApplications)
 
 export const CompanyRouter = router

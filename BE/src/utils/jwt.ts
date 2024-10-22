@@ -6,10 +6,11 @@ import { IJwtPayload } from '../interfaces';
 
 export const generateAceessToken = async (payload:any ) =>{
 
-    const{userId , role} = payload
+    const{userId , role ,id} = payload
     const data = { 
         userId:userId,
-        role:role
+        role:role,
+        id:id
     }
 
     const accessToken:string = jwt.sign(

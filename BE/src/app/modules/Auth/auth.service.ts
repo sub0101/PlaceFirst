@@ -9,10 +9,12 @@ import ApiError from "../../../Error/ApiError"
 import { hashPassword } from "../../../utils/bcrypt"
 import { userInfo } from "os"
 import { generateAceessToken } from "../../../utils/jwt"
+import { AuthUser } from "../../../enums"
 
 const login = async (payload: { userId: string, password: string }):Promise<IUserResponse> => {
-    const { userId, password } = payload;
+    let  { userId, password } = payload;
     console.log(payload)
+    userId = userId.toLocaleLowerCase()
     const auth: Auth | null = await prisma.auth.findUnique({
         where: {
             user_id: userId
@@ -25,9 +27,12 @@ const login = async (payload: { userId: string, password: string }):Promise<IUse
     if (!isPasswordValid) throw new ApiError(401, "Invalid  User Id or Password.");
 
 
+    const user:any = auth.role=="admin"? await prisma.admin.findUnique({where:{adminId:userId} }) :await prisma.student.findUnique({where:{studentId:userId}})
+    console.log(user.id)
     const accessToken = await generateAceessToken( {
         userId: userId,
-        role: auth.role == "Admin" ? "Admin" : "Student"
+        id:user.id,
+        role: auth.role == "admin" ? "Admin" : "Student"
     })
     console.log(accessToken)
 
@@ -43,24 +48,27 @@ const login = async (payload: { userId: string, password: string }):Promise<IUse
 }
 const signupStudent = async (payload: IUserSignUp) => {
 
-    const { name, role, userId, email, password } = payload
+    let { name, userId, email, password ,contact} = payload
+
+userId = userId.toLocaleLowerCase()
     await AuthHelper.isUserExist(userId, email)
     const hpassword = await hashPassword(password);
 
-    const trasaction = prisma.$transaction(async (tx) => {
+    const trasaction  = await prisma.$transaction(async (tx) => {
 
         const auth = await tx.auth.create({
             data: {
                 email: email,
                 user_id: userId,
                 password: hpassword,
-                role: role
+                role: AuthUser.STUDENT
             }
         })
         const student = await tx.student.create({
             data: {
                 name: name,
                 email: email,
+                contact:contact,
                 studentId: userId,
 
             }
@@ -68,7 +76,8 @@ const signupStudent = async (payload: IUserSignUp) => {
     })
 }
 const signupAdmin = async (payload: IUserSignUp) => {
-    const { name, role, userId, email, password } = payload
+    let  { name, userId, email, password ,contact} = payload
+    userId = userId.toLocaleLowerCase()
     await AuthHelper.isUserExist(userId, email)
     const hpassword = await hashPassword(password);
     const trasaction = prisma.$transaction(async (tx) => {
@@ -77,13 +86,14 @@ const signupAdmin = async (payload: IUserSignUp) => {
                 email: email,
                 user_id: userId,
                 password: hpassword,
-                role: role
+                role: AuthUser.ADMIN
             }
         })
         const admin = await tx.admin.create({
             data: {
                 name: name,
                 email: email,
+                contact:contact,
                 adminId: userId,
 
             }
