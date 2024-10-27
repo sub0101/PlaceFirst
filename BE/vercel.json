@@ -1,14 +1,18 @@
 {
     "version": 2,
-    "functions": {
-      "api/**/*.ts": {
-        "runtime": "nodejs14.x"
+    "builds": [
+      {
+        "src": "src/index.ts",
+        "use": "@vercel/node",
+        "config": {
+          "includeFiles": ["src/**/*"]
+        }
       }
-    },
+    ],
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "src/index.ts" 
+        "dest": "/src/index.ts"
       }
     ]
   }
