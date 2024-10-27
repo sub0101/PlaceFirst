@@ -1,0 +1,15 @@
+{
+    "version": 2,
+    "functions": {
+      "api/**/*.ts": {
+        "runtime": "nodejs14.x"
+      }
+    },
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "src/index.ts" 
+      }
+    ]
+  }
+  
