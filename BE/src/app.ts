@@ -8,7 +8,7 @@ import { isAuth } from "./app/middlewares/Auth";
 import cookieParser from "cookie-parser";
 export const app = express();
 
-app.use(cors({origin:"http://localhost:5173" ,
+app.use(cors({origin:["http://localhost:5173" ,'https://place-first.vercel.app'],
     optionsSuccessStatus: 200,
     preflightContinue: false,
     methods: "GET,POST,OPTIONS,PATCH",
