@@ -23,7 +23,7 @@ if(!user) throw new ApiError(401 , "Invalid Token")
 const role:string = user.role
 console.log(role)
 if(!roles.includes((role.toLowerCase()))) throw new ApiError(401 , "your are not authorized") 
-req.user = {id:user.userId , role:user?.role}
+req.user = {id:user.id , role:user?.role}
 console.log("authenticated succes")
 next();
     

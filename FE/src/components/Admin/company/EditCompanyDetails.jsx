@@ -13,9 +13,12 @@ import {
   Divider,
   Tooltip,
 } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { SaveOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
+import { useQuery } from "@tanstack/react-query";
+import { getAllDepartments } from "../../../react query/api/departments";
 
 const { Title } = Typography;
 const { Content } = Layout;
@@ -30,7 +33,8 @@ const useFormSubmit = (initialValues) => {
 
   const handleFinish = (values) => {
     setLoading(true);
-    // Simulate API call to save data
+   
+    
     setTimeout(() => {
       message.success("Company details updated successfully!");
       setLoading(false);
@@ -42,9 +46,16 @@ const useFormSubmit = (initialValues) => {
 };
 
 export default function EditCompanyDetails() {
+  const {data:departments , isLoading }  = useQuery({
+    queryFn:getAllDepartments,
+    queryKey:['departments']
+  })
+  const company = useLocation().state || {}
+  const {companyApplication} = company && company
   const { form, loading, handleFinish } = useFormSubmit({
     // Add initial values here if needed
   });
+  console.log(companyApplication)
 
   return (
     <Layout className="min-h-screen bg-gray-100">
@@ -74,9 +85,10 @@ export default function EditCompanyDetails() {
                       required: true,
                       message: "Please enter the company name",
                     },
+                  
                   ]}
                 >
-                  <Input placeholder="Enter company name" />
+                  <Input defaultValue={company.name} placeholder="Enter company name" />
                 </Form.Item>
 
                 <Form.Item
@@ -86,7 +98,7 @@ export default function EditCompanyDetails() {
                     { required: true, message: "Please enter the industry" },
                   ]}
                 >
-                  <Input placeholder="Enter industry (e.g., Technology, Finance)" />
+                  <Input defaultValue={company.type} placeholder="Enter industry (e.g., Technology, Finance)" />
                 </Form.Item>
 
                 <Form.Item
@@ -99,7 +111,7 @@ export default function EditCompanyDetails() {
                     },
                   ]}
                 >
-                  <Input placeholder="Enter company website" />
+                  <Input defaultValue={company?.website} placeholder="Enter company website" />
                 </Form.Item>
 
                 <Form.Item
@@ -109,7 +121,7 @@ export default function EditCompanyDetails() {
                     { required: true, message: "Please enter the location" },
                   ]}
                 >
-                  <Input placeholder="Enter company location" />
+                  <Input defaultValue={company.location} placeholder="Enter company location" />
                 </Form.Item>
               </div>
 
@@ -126,7 +138,7 @@ export default function EditCompanyDetails() {
                     },
                   ]}
                 >
-                  <Input placeholder="Enter contact person name" />
+                  <Input defaultValue={company.contactPerson} placeholder="Enter contact person name" />
                 </Form.Item>
 
                 <Form.Item
@@ -140,7 +152,7 @@ export default function EditCompanyDetails() {
                     { type: "email", message: "Please enter a valid email" },
                   ]}
                 >
-                  <Input placeholder="Enter contact email" />
+                  <Input defaultValue={company.contactEmail} placeholder="Enter contact email" />
                 </Form.Item>
 
                 <Form.Item
@@ -153,7 +165,7 @@ export default function EditCompanyDetails() {
                     },
                   ]}
                 >
-                  <Input placeholder="Enter contact phone" />
+                  <Input defaultValue={company.contactPhone} placeholder="Enter contact phone" />
                 </Form.Item>
               </div>
 
@@ -167,7 +179,7 @@ export default function EditCompanyDetails() {
                     { required: true, message: "Please enter the job title" },
                   ]}
                 >
-                  <Input placeholder="Enter job title (e.g., Software Engineer)" />
+                  <Input defaultValue={companyApplication.jobTitle} placeholder="Enter job title (e.g., Software Engineer)" />
                 </Form.Item>
 
                 <Form.Item
@@ -180,7 +192,7 @@ export default function EditCompanyDetails() {
                     },
                   ]}
                 >
-                  <InputNumber
+                  <InputNumber defaultValue={companyApplication.openRoles}
                     min={1}
                     placeholder="Enter number of open roles"
                     className="w-full"
@@ -194,12 +206,13 @@ export default function EditCompanyDetails() {
                     { required: true, message: "Please enter the CTC offered" },
                   ]}
                 >
-                  <Input placeholder="Enter CTC (e.g., ₹10,00,000)" />
+                  <Input defaultValue={companyApplication.ctc} placeholder="Enter CTC (e.g., ₹10,00,000)" />
                 </Form.Item>
 
                 <Form.Item
                   name="stipend"
                   label="Stipend"
+                  
                   rules={[
                     {
                       required: true,
@@ -207,7 +220,7 @@ export default function EditCompanyDetails() {
                     },
                   ]}
                 >
-                  <Input placeholder="Enter stipend amount (e.g., ₹20,000/month)" />
+                  <Input defaultValue={companyApplication.stipend} placeholder="Enter stipend amount (e.g., ₹20,000/month)" />
                 </Form.Item>
 
                 <Form.Item
@@ -220,7 +233,7 @@ export default function EditCompanyDetails() {
                     },
                   ]}
                 >
-                  <Input placeholder="Enter internship duration (e.g., 6 months)" />
+                  <Input defaultValue={companyApplication.internshipDuration} placeholder="Enter internship duration (e.g., 6 months)" />
                 </Form.Item>
 
                 <Form.Item
@@ -230,7 +243,7 @@ export default function EditCompanyDetails() {
                     { required: true, message: "Please enter the bond period" },
                   ]}
                 >
-                  <Input placeholder="Enter bond period (e.g., 1 year)" />
+                  <Input defaultValue={companyApplication.bondPeriod} placeholder="Enter bond period (e.g., 1 year)" />
                 </Form.Item>
               </div>
 
@@ -244,7 +257,7 @@ export default function EditCompanyDetails() {
                   },
                 ]}
               >
-                <TextArea
+                <TextArea defaultValue={companyApplication.jonDescription}
                   rows={4}
                   placeholder="Enter detailed job description"
                 />
@@ -262,8 +275,8 @@ export default function EditCompanyDetails() {
                       message: "Please specify the recruitment mode",
                     },
                   ]}
-                >
-                  <Select placeholder="Select recruitment mode">
+                > 
+                  <Select defaultValue={companyApplication.recruitmentMode} placeholder="Select recruitment mode">
                     <Option value="Online">Online</Option>
                     <Option value="Offline">Offline</Option>
                     <Option value="Hybrid">Hybrid</Option>
@@ -280,7 +293,7 @@ export default function EditCompanyDetails() {
                     },
                   ]}
                 >
-                  <DatePicker className="w-full" />
+                  <DatePicker  className="w-full" />
                 </Form.Item>
 
                 <Form.Item
@@ -293,7 +306,7 @@ export default function EditCompanyDetails() {
                     },
                   ]}
                 >
-                  <DatePicker className="w-full" />
+                  <DatePicker defaultValue= {dayjs(companyApplication.interviewDate) }className="w-full" />
                 </Form.Item>
 
                 <Form.Item
@@ -310,9 +323,9 @@ export default function EditCompanyDetails() {
                     { required: true, message: "Please enter the PPT date" },
                   ]}
                 >
-                  <DatePicker className="w-full" />
+                  <DatePicker defaultValue={dayjs(companyApplication.pptDate) } className="w-full" />
                 </Form.Item>
-              </div>
+              </div>  
 
               <Form.Item
                 name="selectionProcess"
@@ -374,6 +387,7 @@ export default function EditCompanyDetails() {
                   <Form.Item
                     name="allowedBranches"
                     label="Allowed Branches"
+                    initialValue={companyApplication.allowedBranches}
                     rules={[
                       {
                         required: true,
@@ -382,14 +396,19 @@ export default function EditCompanyDetails() {
                     ]}
                   >
                     <Select
+                  
                       mode="multiple"
                       placeholder="Select allowed branches"
                     >
-                      <Option value="CSE">CSE</Option>
-                      <Option value="ECE">ECE</Option>
+                      { departments && departments.map((item)=>(
+        <Option key={item.id} value={item.name}>{item.name}</Option>
+                      ))}
+                    
+                      {/* <Option value="CSE">CSE</Option>
+              
                       <Option value="IT">IT</Option>
                       <Option value="EEE">EEE</Option>
-                      <Option value="Mechanical">Mechanical</Option>
+                      <Option value="Mechanical">Mechanical</Option> */}
                     </Select>
                   </Form.Item>
                 </div>

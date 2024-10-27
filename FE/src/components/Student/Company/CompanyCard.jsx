@@ -39,7 +39,7 @@ const CompanyCard = ({ title, status, type, ctc, date, applicants,companyId }) =
         )} */}
       </Space>
       <Space direction="vertical" size="small" style={{ width: '100%', marginTop: '16px' }}>
-        <Button type="primary" icon={<ArrowRightOutlined />} onClick={() => navigate("../details")} block>
+        <Button type="primary" icon={<ArrowRightOutlined />} onClick={() => navigate(`./details/${companyId}`)} block>
           {status === 'ongoing' ? 'View Application' : 'View Details'}
         </Button>
         {status === 'ongoing' && (

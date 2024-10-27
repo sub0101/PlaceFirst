@@ -5,7 +5,7 @@ import sendResponse from "../../../../Shared/sendResponse";
 const getApplicants = catchAsync(async(req:Request , res:Response) =>{
 
     const params:string = req.params.id;
-    console.log(req.params)
+
     const response = await ApplicantService.getApplicants(req.body , params)
     sendResponse<any>(res ,{
         message:"Successfully feched Applicants",

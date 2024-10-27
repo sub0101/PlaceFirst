@@ -7,10 +7,12 @@ const getProfile = async (user:any)=>{
     console.log(user)
     const student = await prisma.student.findUnique({
         where:{
-        studentId:user.id
+        id:user.id
         },
         include:{
-            education:true
+            education:true,
+            department:true,
+            course:true
         }
         
     })
@@ -20,14 +22,17 @@ const getProfile = async (user:any)=>{
 const updateProfile = async(user:any , data:any) =>{
     // console.log(user)
     const {studentInfo , education} = data
-    console.log(user)
-    console.log(data)
+    const {departmentId ,department, courseId, course , ...updateData } = studentInfo
+    console.log(updateData)
     const student = await  prisma.student.update({
-       data:studentInfo,
+       data:{
+        ...updateData,
+        departmentId:departmentId,
+        courseId:courseId
+       },
         where:{
-            studentId:user.id
+            id:user.id
         }
-        
     })
     // await prisma.education.create({
     //     data: {
@@ -53,8 +58,21 @@ const updateProfile = async(user:any , data:any) =>{
     // }
     return student
 }
+
+const getAllProfiles = async()=>{
+
+    const response  = await prisma.student.findMany({
+        include:{
+            department:true,
+            course:true
+        }
+    });
+
+    return response;
+}
 export const S_ProfileService = {
     getProfile,
-    updateProfile
+    updateProfile,
+    getAllProfiles
 }
 

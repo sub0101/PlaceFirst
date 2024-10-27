@@ -14,3 +14,14 @@ export const updateProfile = async(data)=>{
     console.log(response.data.data)
     return response.data.data
 }
+export const getAllStudents = async() =>{
+    const response = await authAxios.get(`${S_URL}/all`)
+    console.log(response.data.data);
+    return response.data.data;
+}
+
+export const getAdminProfile = async()=>{
+    const response = await authAxios.get(A_URL);
+    console.log(response.data.data)
+    return response.data.data;
+}

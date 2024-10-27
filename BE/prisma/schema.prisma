@@ -13,6 +13,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  STUDENT 
+  ADMIN
+} 
+
 model Auth {
   id       String @id @default(uuid())
   user_id  String @unique
@@ -29,9 +34,12 @@ model Student {
   studentId  String      @unique
   email      String      @unique
   branch     String?
-  course     String?
-  department String?
+  courseId Int?
+  course     Course? @relation(fields: [courseId] , references: [id])
+  departmentId Int?
+  department Department? @relation(fields: [departmentId] , references: [id])
   debarred Boolean ? @default(false)
+  status Boolean ? @default(false)
   applicant  Applicant[]
   education Education[]
 }
@@ -56,7 +64,7 @@ model Company {
   contactEmail       String              @unique
   contactPhone       String              @unique
   visitDate          String
-  status String?
+  status String? 
   addedAt            DateTime            @default(now())
   companyApplication CompanyApplication?
   createdAt          DateTime            @default(now())
@@ -99,7 +107,7 @@ model Applicant {
   cgpa Int?
   precentage Int?
   resumeUrl            String?
-  status               String? @default("pending")
+  status              String ? 
   appliedAt            DateTime           @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -114,3 +122,18 @@ model Education {
   currentEducation Boolean?
 
 }
+
+
+model Department {
+  id Int @id @default(autoincrement())
+  name String
+  student Student[]
+
+}
+
+model Course {
+  id Int @id @default(autoincrement())
+  name String
+  student Student[]
+}
+

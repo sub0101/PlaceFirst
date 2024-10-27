@@ -17,6 +17,9 @@ import CompanyDetails from "./components/shared/CompanyDetails";
 import StudentRegistration from "./components/Auth/StudentRegistration";
 import ApplicationForm from "./components/Student/Application/ApplicaionForm";
 import Applicants from "./components/Admin/company/Applicants";
+import Company from "./components/Student/Company/Company";
+import StudentProfile from "./components/Student/StudentProfile";
+import StudentHomee from "./components/Student/StudentHomee";
 function App() {
   return (
     <Router>
@@ -26,7 +29,6 @@ function App() {
           element={
             <ProtectedLogin>
               <Login />
-          
             </ProtectedLogin>
           }
         />
@@ -35,11 +37,9 @@ function App() {
           element={
             <ProtectedLogin>
               <StudentRegistration />
-          
             </ProtectedLogin>
           }
         />
-        
 
         <Route element={<PrivateOutlet />}>
           <Route element={<Home requiredRole={"Admin"} />}>
@@ -54,7 +54,7 @@ function App() {
               <Route path="profile" element={<Profile />} />
               <Route path="add-company" element={<AddCompanyPage />} />
               <Route
-                path="manage-companies/edit"
+                path="manage-companies/edit/:id"
                 element={<EditCompanyDetails />}
               />
               <Route path="details/:id" element={<CompanyDetails />} />
@@ -63,10 +63,14 @@ function App() {
           </Route>
 
           <Route element={<Home requiredRole={"Student"} />}>
-            <Route path="" element={<StudentPage />} />
-            <Route path="details" element={<CompanyDetails />} />
-            <Route path="/application/:id" element={<ApplicationForm />} />
+            <Route path="" element={<StudentPage />}>
+            <Route path="" element={<StudentHomee /> } />
+              <Route path="company" element={<Company />}></Route>
+              <Route path="company/details/:id" element={<CompanyDetails />} />
 
+              <Route path="/application/:id" element={<ApplicationForm />} />
+              <Route path="profile" element={<StudentProfile />} />
+            </Route>
           </Route>
 
           <Route path="*" element={<NotFound />} />

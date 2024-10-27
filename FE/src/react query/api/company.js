@@ -20,3 +20,10 @@ export const getAllCompanyApplications = async()=>{
 
     return response.data.data
 }
+
+export const getCompanyApplication = async(id)=>{
+    // const id="9baac591-e034-4206-9adf-677ccb062e17"
+    const response = await authAxios.get(`${URL}/${id}`);
+    console.log(response.data.data)
+    return response.data.data
+}

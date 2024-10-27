@@ -1,31 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
-import {
-  Form,
-  Input,
-  Button,
-  Card,
-  Typography,
-  Select,
-  Divider,
-  message,
-  Upload,
-  Avatar,
-  Row,
-  Col,
-  Spin,
-} from 'antd';
+import { Form, Input, Button, Card, Typography, Select, Divider, message, Upload, Avatar, Row, Col, Spin } from 'antd';
 import { PlusOutlined, DeleteOutlined, UserOutlined, MailOutlined, PhoneOutlined, IdcardOutlined } from '@ant-design/icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { getStudentProfile, updateProfile } from '../../react query/api/profile';
+import { getAllDepartments,getAllCourses } from '../../react query/api/departments';
 
 const { Title } = Typography;
 const { Option } = Select;
 
 export default function StudentProfile() {
   const [imageUrl, setImageUrl] = useState(null);
-  const { control, handleSubmit, reset, formState: { errors, dirtyFields } } = useForm();
+  const { control, handleSubmit, reset, formState: { errors } } = useForm({
+    defaultValues: {
+      name: '',
+      email: '',
+      studentId: '',
+      contact: '',
+      branch: '',
+      course: '',
+      department: { id: '', name: '' },
+      education: []
+    }
+  });
   const { fields, append, remove } = useFieldArray({
     control,
     name: "education"
@@ -36,15 +34,22 @@ export default function StudentProfile() {
     queryFn: getStudentProfile,
   });
 
+  const { data: departments, isLoading: departmentLoading } = useQuery({
+    queryFn: getAllDepartments,
+    queryKey: ['departments']
+  });
+  const {data:fetchedCourses , isLoading:courseLoadig , isSuccess:isSuccessCourse} = useQuery({
+    queryFn:getAllCourses,
+    queryKey:['getAllCourses']
+
+  })
+
   const profileMutation = useMutation({
     mutationFn: updateProfile,
-    mutationKey: ["updateProfile"],
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: () => {
       message.success('Profile updated successfully!');
     },
-    onError: (err) => {
-      console.error(err);
+    onError: () => {
       message.error('Failed to update profile');
     }
   });
@@ -52,34 +57,16 @@ export default function StudentProfile() {
   useEffect(() => {
     if (userProfile) {
       reset(userProfile);
+      setImageUrl(userProfile.avatarUrl);
     }
   }, [userProfile, reset]);
 
   const onSubmit = (data) => {
-    // console.log(data)
-    const changedValues = {};
-    const {education , ...studentInfo} = data
-    console.log(education)
-    console.log(studentInfo)
-    // Object.keys(dirtyFields).forEach(key => {
-    //   if (key === 'education') {
-    //     changedValues.education = data.education.filter((_, index) => dirtyFields.education[index]);
-    //   } else {
-    //     changedValues[key] = data[key];
-    //   }
-    // });
-    // console.log(data)
-// console.log(changedValues)
-    // if (Object.keys(changedValues).length > 0) {
-    //   // profileMutation.mutate(changedValues); 
-    // } else {
-    //   message.info('No changes detected');
-    // }
-    const finaldata = {education , studentInfo}
-    console.log(finaldata)
-    profileMutation.mutate(finaldata)
-
-    // reset()
+    const { education, ...studentInfo } = data;
+    studentInfo.departmentId = Number(studentInfo.department?.id);
+    studentInfo.courseId  = Number(studentInfo.course?.id)
+    const finalData = { education, studentInfo };
+    profileMutation.mutate(finalData);
   };
 
   const handleImageUpload = (info) => {
@@ -98,6 +85,11 @@ export default function StudentProfile() {
       message.error('You can only upload JPG/PNG files!');
       return Upload.LIST_IGNORE;
     }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error('Image must be smaller than 2MB!');
+      return Upload.LIST_IGNORE;
+    }
     return true;
   };
 
@@ -107,39 +99,43 @@ export default function StudentProfile() {
     { name: 'year', label: 'Year', placeholder: 'e.g., 2023' },
   ];
 
-  if (isLoading) return <div><Spin  /> </div>;
-  if (isError) return <div>Error loading profile</div>;
+  if (isLoading) return <Spin size="large" />;
+  if (isError) return <Title level={3}>Error loading profile</Title>;
+
   return (
     <Card 
       title={<Title level={2}>Student Profile</Title>} 
       style={{ maxWidth: 1000, margin: '0 auto' }}
     >
-      <Row justify="center" style={{ marginBottom: 24 }}>
-        <Col>
-          <Upload
-            name="avatar"
-            listType="picture-circle"
-            className="avatar-uploader"
-            showUploadList={false}
-            beforeUpload={beforeImageUpload}
-            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-            onChange={handleImageUpload}
-            customRequest={({ onSuccess }) => {
-              setTimeout(() => {
-                onSuccess("ok");
-              }, 0);
-            }}
-          >
-            {imageUrl ? (
-              <Avatar size={100} src={imageUrl} />
-            ) : (
-              <Avatar size={100} icon={<UserOutlined />} />
-            )}
-          </Upload>
-        </Col>
-      </Row>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Row gutter={[32, 32]}>
+      <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
+        <Row justify="center" style={{ marginBottom: 24 }}>
+          <Col>
+            <Upload
+              name="avatar"
+              listType="picture-circle"
+              className="avatar-uploader"
+              showUploadList={false}
+              beforeUpload={beforeImageUpload}
+              onChange={handleImageUpload}
+              customRequest={({ onSuccess }) => {
+                setTimeout(() => {
+                  onSuccess?.("ok");
+                }, 0);
+              }}
+            >
+              {imageUrl ? (
+                <Avatar size={100} src={imageUrl} />
+              ) : (
+                <div>
+                  <PlusOutlined />
+                  <div style={{ marginTop: 8 }}>Upload</div>
+                </div>
+              )}
+            </Upload>
+          </Col>
+        </Row>
+
+        <Row gutter={[32, 16]}>
           <Col xs={24} sm={12}>
             <Controller
               name="name"
@@ -212,9 +208,9 @@ export default function StudentProfile() {
               render={({ field }) => (
                 <Form.Item label="Branch">
                   <Select {...field} placeholder="Select your branch">
-                    <Option value="computer_science">Computer Science</Option>
-                    <Option value="information_technology">Information Technology</Option>
-                    {/* Add other options here */}
+                    {!departmentLoading && departments?.map((item) => (
+                      <Option key={item.id} value={item.name}>{item.name}</Option> 
+                    ))}
                   </Select>
                 </Form.Item>
               )}
@@ -226,12 +222,20 @@ export default function StudentProfile() {
               control={control}
               render={({ field }) => (
                 <Form.Item label="Course">
-                  <Select {...field} placeholder="Select your course">
-                    <Option value="btech">B.Tech</Option>
+                  <Select  placeholder="Select your course"
+                  value={field.value?.name}
+                  onChange={(value, option) => {
+                    field.onChange({ id: option.key, name: value });
+                  }}
+                  >
+                  {!courseLoadig && fetchedCourses?.map((item) => (
+                      <Option key={item.id} value={item.name}>{item.name}</Option> 
+                    ))}
+                    {/* <Option value="btech">B.Tech</Option>
                     <Option value="mtech">M.Tech</Option>
                     <Option value="phd">Ph.D</Option>
                     <Option value="mca">MCA</Option>
-                    <Option value="msc">MSC</Option>
+                    <Option value="msc">MSC</Option> */}
                   </Select>
                 </Form.Item>
               )}
@@ -243,10 +247,16 @@ export default function StudentProfile() {
               control={control}
               render={({ field }) => (
                 <Form.Item label="Department">
-                  <Select {...field} placeholder="Select your department">
-                    <Option value="computer_science">Computer Science</Option>
-                    <Option value="information_technology">Information Technology</Option>
-                    {/* Add other options here */}
+                  <Select 
+                    placeholder="Select your department"
+                    value={field.value?.name}
+                    onChange={(value, option) => {
+                      field.onChange({ id: option.key, name: value });
+                    }}
+                  >
+                    {!departmentLoading && departments?.map((item) => (
+                      <Option key={item.id} value ={item.name}>{item.name}</Option> 
+                    ))}
                   </Select>
                 </Form.Item>
               )}
@@ -293,16 +303,22 @@ export default function StudentProfile() {
             </motion.div>
           ))}
         </AnimatePresence>
-        <Button type="dashed" onClick={() => append({ degree: '', institution: '', year: '' })} block icon={<PlusOutlined />}>
+        <Button 
+          type="dashed" 
+          onClick={() => append({ degree: '', institution: '', year: '' })} 
+          block 
+          icon={<PlusOutlined />}
+          style={{ marginBottom: 16 }}
+        >
           Add Education
         </Button>
 
-        <Form.Item style={{ marginTop: '20px' }}>
-          <Button type="primary" htmlType="submit" size="large">
+        <Form.Item>
+          <Button type="primary" htmlType="submit" size="large" block>
             Update Profile
           </Button>
         </Form.Item>
-      </form>
+      </Form>
     </Card>
   );
 }

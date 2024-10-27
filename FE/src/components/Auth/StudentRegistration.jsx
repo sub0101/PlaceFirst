@@ -143,7 +143,9 @@ export default function StudentSignup() {
             >
               <Form.Item
                 name="password"
-                rules={[{ required: true, message: 'Please input your password!' }]}
+                rules={[{ required: true, message: 'Please input your password!'},
+                  { message:"Password must include at least one uppercase letter, one lowercase letter, one number, and one special character" ,pattern:/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*])/ }]}
+
               >
                 <Input.Password prefix={<LockOutlined className="text-indigo-500" />} placeholder="Password" />
               </Form.Item>

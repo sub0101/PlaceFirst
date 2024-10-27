@@ -4,7 +4,7 @@ import { Layout, Card, Button, Typography, Select, Row, Col } from 'antd';
 import { useState } from 'react';
 const { Title, Paragraph } = Typography;
 
-function StudentHome() {
+function StudentHomee() {
   const [username] = useState('John Doe'); 
   return (
     <>
@@ -38,5 +38,5 @@ function StudentHome() {
   )
 }
 
-export default StudentHome
+export default StudentHomee
 

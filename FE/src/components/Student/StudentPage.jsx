@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { Layout, Menu, Card, Button, Typography, Avatar, Row, Col, Drawer, theme } from 'antd';
-import logo from "../../assets/logo.svg"
+import React, { useState, useEffect } from 'react';
+import { Layout, Menu, Button, Typography, Avatar, Row, Col, Drawer, theme } from 'antd';
 import {
   HomeOutlined,
   BuildOutlined,
@@ -9,161 +8,146 @@ import {
   UserOutlined,
   FileTextOutlined,
   LogoutOutlined,
-  MenuOutlined
+  MenuFoldOutlined,
+  MenuUnfoldOutlined
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-
-// Assume these components exist in your project
-import StudentHome from './StudentHome';
-import Company from './Company/Company';
-import StudentProfile from './StudentProfile';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { loggedOut } from '../../utils/auth/getUserInfo';
+import logo from "../../assets/logo.svg";
 
 const { Header, Sider, Content } = Layout;
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
-const StudentPage=() => {
-  const [selectedKey, setSelectedKey] = useState('1');
+const StudentPage = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [mobileDrawerVisible, setMobileDrawerVisible] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const location = useLocation();
   const navigate = useNavigate();
   const { token } = theme.useToken();
 
-  const handleLogout = () => {
-    // Implement your logout logic here
-    loggedOut()
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const handleLogout = () => {  
+    loggedOut();
     navigate("/login");
   };
 
   const menuItems = [
-    { key: '1', icon: <HomeOutlined />, label: 'Home' },
-    { key: '2', icon: <BuildOutlined />, label: 'Company' },
-    { key: '3', icon: <TeamOutlined />, label: 'Students' },
-    { key: '4', icon: <CheckCircleOutlined />, label: 'Applied' },
-    { key: '5', icon: <CheckCircleOutlined />, label: 'Placed' },
-    { key: '6', icon: <UserOutlined />, label: 'Profile' },
-    { key: '7', icon: <FileTextOutlined />, label: 'Application Tracker' },
+    { key: '/', icon: <HomeOutlined />, label: 'Home' },
+    { key: '/company', icon: <BuildOutlined />, label: 'Company' },
+    { key: '/applied', icon: <CheckCircleOutlined />, label: 'Applied' },
+    { key: '/profile', icon: <UserOutlined />, label: 'Profile' },
+    { key: '/application-tracker', icon: <FileTextOutlined />, label: 'Application Tracker' },
   ];
-
-  const renderContent = () => {
-    switch (selectedKey) {
-      case '1':
-        return <StudentHome />;
-      case '2':
-        return <Company />;
-      case '6':
-        return <StudentProfile />;
-      case '7':
-        return (
-          <div>
-            <Title level={2}>My Applications</Title>
-            <Row gutter={[16, 16]}>
-              {['Google', 'Microsoft'].map((company, index) => (
-                <Col xs={24} sm={12} key={company}>
-                  <Card
-                    title={company}
-                    extra={<Button type="primary">View Details</Button>}
-                    hoverable
-                    style={{ boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}
-                  >
-                    <p>Status: {index === 0 ? 'Applied' : 'Interview Scheduled'}</p>
-                    <p>Interview Date: {index === 0 ? '25th Oct 2024' : '30th Oct 2024'}</p>
-                  </Card>
-                </Col>
-              ))}
-            </Row>
-          </div>
-        );
-      default:
-        return <div>Content for {menuItems.find(item => item.key === selectedKey)?.label}</div>;
-    }
-  };
 
   const SideMenu = () => (
     <Menu
       theme="light"
       mode="inline"
-      defaultSelectedKeys={['1']}
-      selectedKeys={[selectedKey]}
+      selectedKeys={[location.pathname]}
       onClick={({ key }) => {
-        setSelectedKey(key);
-        setDrawerVisible(false);
+        navigate(key);
+        setMobileDrawerVisible(false);
       }}
       items={menuItems}
       style={{
-        background: token.colorBgContainer,
+        borderRight: 'none',
       }}
     />
   );
 
+  const siderWidth = 200;
+
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout className="min-h-screen">
       <Sider
-        breakpoint="lg"
-        collapsedWidth="0"
-        onBreakpoint={(broken) => {
-          setCollapsed(broken);
-        }}
-        onCollapse={(collapsed, type) => {
-          console.log(collapsed, type);
-        }}
         trigger={null}
         collapsible
         collapsed={collapsed}
-        theme="light"
+        breakpoint="lg"
+        onBreakpoint={(broken) => {
+          setCollapsed(broken);
+        }}
+        className="hidden lg:block fixed left-0 top-0 bottom-0 z-10"
         style={{
+          overflow: 'auto',
+          height: '100vh',
+          backgroundColor: token.colorBgContainer,
           boxShadow: '2px 0 8px 0 rgba(29,35,41,.05)',
-          background: token.colorBgContainer,
+          width: collapsed ? 80 : siderWidth,
+          minWidth: collapsed ? 80 : siderWidth,
+          maxWidth: collapsed ? 80 : siderWidth,
         }}
       >
-        <div className="logo" style={{ 
+        <div style={{ 
           height: 64, 
           margin: 16, 
-          // background: token.colorPrimary, 
+          background: token.colorPrimary, 
           display: 'flex', 
           alignItems: 'center', 
-          justifyContent: 'center' 
+          justifyContent: 'center',
+          borderRadius: token.borderRadiusLG,
         }}>
-          {/* <Title level={4} style={{ color: token.colorWhite, margin: 0 }}>PLACEMENT PORTAL</Title> */}
-          <Avatar size={80} src={logo} />
+          <img src={logo} alt="Logo" style={{ height: '32px', marginRight: collapsed ? 0 : 8 }} />
+          {!collapsed && <Title level={4} style={{ color: token.colorWhite, margin: 0 }}>STUDENT PORTAL</Title>}
         </div>
         <SideMenu />
       </Sider>
-      <Layout>
-        <Header style={{ 
-          padding: 0, 
-          background: token.colorBgContainer, 
-          boxShadow: '0 1px 4px rgba(0,21,41,.08)',
-          position: 'sticky',
-          top: 0,
-          zIndex: 1,
-          width: '100%',
-        }}>
-          <Row justify="space-between" align="middle" style={{ height: '100%', padding: '0 16px' }}>
+      <Layout className={`transition-all duration-300 ease-in-out ${windowWidth >= 992 ? (collapsed ? 'lg:ml-[80px]' : 'lg:ml-[200px]') : ''}`}>
+        <Header className="p-0 bg-white shadow-md sticky top-0 z-20 w-full">
+          <Row justify="space-between" align="middle" className="h-full px-4">
             <Col>
-              {React.createElement(collapsed ? MenuOutlined : MenuOutlined, {
-                className: 'trigger',
-                onClick: () => setCollapsed(!collapsed),
-                style: { fontSize: '18px', color: token.colorPrimary }
-              })}
+              <Button
+                type="text"
+                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                onClick={() => setCollapsed(!collapsed)}
+                className="hidden lg:flex text-lg text-primary"
+              />
+              <Button
+                type="text"
+                icon={<MenuUnfoldOutlined />}
+                onClick={() => setMobileDrawerVisible(true)}
+                className="lg:hidden text-lg text-primary"
+              />
+            </Col>
+            <Col className="hidden sm:block">
+              <Title level={4} className="m-0">WELCOME TO STUDENT PORTAL</Title>
             </Col>
             <Col>
-              <Avatar icon={<UserOutlined />} style={{ backgroundColor: token.colorPrimary, marginRight: 8 }} />
-              <Button type="link" icon={<LogoutOutlined />} onClick={handleLogout} style={{ color: token.colorPrimary }}>
+              <Avatar icon={<UserOutlined />} className="bg-primary mr-2" />
+              <Button 
+                type="primary" 
+                icon={<LogoutOutlined />} 
+                onClick={handleLogout}
+                className="hidden sm:inline-flex"
+              >
                 Logout
               </Button>
+              <Button
+                type="text"
+                icon={<LogoutOutlined />}
+                onClick={handleLogout}
+                className="sm:hidden text-primary"
+              />
             </Col>
           </Row>
         </Header>
-        <Content style={{ margin: '24px 16px', padding: 24, background: token.colorBgContainer, borderRadius: token.borderRadiusLG }}>
-          {renderContent()}
+        <Content className="m-4">
+          <div className="p-6 bg-white rounded-lg shadow-sm">
+            <Outlet />
+          </div>
         </Content>
       </Layout>
       <Drawer
-        title="Menu"
+        title="Student Menu"
         placement="left"
-        onClose={() => setDrawerVisible(false)}
-        open={drawerVisible}
+        onClose={() => setMobileDrawerVisible(false)}
+        open={mobileDrawerVisible}
         bodyStyle={{ padding: 0 }}
       >
         <SideMenu />

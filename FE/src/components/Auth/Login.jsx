@@ -14,7 +14,9 @@ import "react-toastify/dist/ReactToastify.css";
 
 function Login() {
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors },watch } = useForm({
+    mode: 'onBlur',  // Enable validation onChange
+  });
   const navigate = useNavigate();
 
   const mutation = useMutation({
@@ -30,7 +32,7 @@ function Login() {
       toast.error(error.response?.data?.message || "Login failed");
     },
   });
-
+  const password = watch('password', '');
   const onSubmit = (data) => {
     setLoading(true);
     mutation.mutate(data);
@@ -109,7 +111,11 @@ function Login() {
               <div className="relative">
                 <LockOutlined className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
-                  {...register("password", { required: "Password is required" })}
+                  {...register("password", { required: "Password is required" ,pattern: {
+                    value: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*])/,
+                    message:
+                      'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character',
+                  }, } )}
                   className="text-gray-700 border border-gray-300 rounded py-2 px-4 block w-full pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   type="password"
                   id="password"

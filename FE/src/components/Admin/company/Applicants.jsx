@@ -11,7 +11,8 @@ const { Content } = Layout;
 const { Option } = Select;
 
 const Applicants = () => {
-  const { companyId } = useParams();
+  const { id: companyId } = useParams();
+  console.log(companyId)
   const location = useLocation();
   const { companyApplication } = location.state || {};
 
@@ -19,7 +20,7 @@ const Applicants = () => {
   const [filterBranch, setFilterBranch] = useState('');
 
   const { data: applicants, isLoading, isError } = useQuery({
-    queryFn: getApplicants,
+    queryFn: ()=>getApplicants(companyId),
     queryKey: ["applicants"]
   });
 

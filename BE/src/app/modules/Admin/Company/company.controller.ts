@@ -20,7 +20,8 @@ const getAllCompanies= catchAsync(async (req , res) =>{
 })
 
 const getAllApplications = catchAsync(async(req:Request , res:Response) =>{
-    const response = await CompanyService.getAllApplications()
+    console.log("getALl")
+    const response = await CompanyService.getAllApplications(req.user)
     sendResponse<any>(res , {
         statusCode:httpStatus.OK,
         success:true,
@@ -40,10 +41,19 @@ const addCompany= catchAsync(async (req , res) =>{
     })
 
 })
-
+const getApplicationDetail = catchAsync(async(req:Request , res:Response) =>{
+    const response = await CompanyService.getApplication(req.user , req.params.id)
+    sendResponse<any>(res , {
+        statusCode:httpStatus.OK,
+        success:true,
+        message:"Successfully Fetched Company Application",
+        data:response
+    })
+})
 
 export const CompanyController = {
     getAllCompanies,
     addCompany,
-    getAllApplications
+    getAllApplications,
+    getApplicationDetail
 }
