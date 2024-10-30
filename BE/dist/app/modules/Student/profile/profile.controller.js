@@ -44,9 +44,19 @@ const getAllProfiles = (0, ayncError_1.catchAsync)((req, res) => __awaiter(void 
         data: response
     });
 }));
+const getStudentInfo = (0, ayncError_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield profile_service_1.S_ProfileService.getStudentInfo(req.params.id);
+    (0, sendResponse_1.default)(res, {
+        message: "SuccessFully get details",
+        success: true,
+        statusCode: 201,
+        data: response
+    });
+}));
 exports.S_ProfileController = {
     getProfile,
     updateProfile,
-    getAllProfiles
+    getAllProfiles,
+    getStudentInfo
 };
 //# sourceMappingURL=profile.controller.js.map

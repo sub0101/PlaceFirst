@@ -13,5 +13,6 @@ router.get("/", (0, Auth_1.isAuth)(enums_1.AuthUser.ADMIN), company_controller_1
 router.get("/applications", (0, Auth_1.isAuth)(enums_1.AuthUser.STUDENT), company_controller_1.CompanyController.getAllApplications);
 router.get('/:id', (0, Auth_1.isAuth)(enums_1.AuthUser.ADMIN, enums_1.AuthUser.STUDENT), company_controller_1.CompanyController.getApplicationDetail);
 router.post("/", (0, Auth_1.isAuth)(enums_1.AuthUser.ADMIN), company_controller_1.CompanyController.addCompany);
+router.patch('/', (0, Auth_1.isAuth)(enums_1.AuthUser.ADMIN), company_controller_1.CompanyController.updateCompany);
 exports.CompanyRouter = router;
 //# sourceMappingURL=company.router.js.map

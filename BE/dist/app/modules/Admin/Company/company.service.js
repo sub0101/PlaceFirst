@@ -34,7 +34,6 @@ const addCompany = (user, payload) => __awaiter(void 0, void 0, void 0, function
     const admin = prisma_1.default.admin.findUnique({
         where: { id: user.id }
     });
-    // console.log()
     const result = yield prisma_1.default.company.create({
         data: Object.assign(Object.assign({}, company), { companyApplication: {
                 create: Object.assign({}, companyApplication)
@@ -46,7 +45,6 @@ const addCompany = (user, payload) => __awaiter(void 0, void 0, void 0, function
     return result;
 });
 const getAllCompanies = (user) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("getting");
     const data = yield prisma_1.default.company.findMany({
         include: {
             companyApplication: {
@@ -63,7 +61,25 @@ const getAllCompanies = (user) => __awaiter(void 0, void 0, void 0, function* ()
     return data;
 });
 const getCompanyDetails = () => __awaiter(void 0, void 0, void 0, function* () { });
-const updateCompany = () => __awaiter(void 0, void 0, void 0, function* () {
+const updateCompany = (user, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const { companyApplication, company } = payload;
+    console.log(company);
+    console.log(companyApplication);
+    const response = yield prisma_1.default.company.update({
+        where: {
+            id: company.id
+        },
+        data: {
+            companyApplication: {
+                update: Object.assign({}, companyApplication)
+            }
+        },
+        select: {
+            companyApplication: true
+        }
+    });
+    console.log(response);
+    return response;
 });
 const getAllApplications = (user) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = user;
@@ -73,7 +89,6 @@ const getAllApplications = (user) => __awaiter(void 0, void 0, void 0, function*
             name: true,
             industry: true,
             visitDate: true,
-            status: true,
             location: true,
             companyApplication: {
                 include: {
@@ -113,7 +128,6 @@ const getApplication = (user, comapnyId) => __awaiter(void 0, void 0, void 0, fu
                     contactPerson: is_admin,
                     contactEmail: is_admin,
                     contactPhone: is_admin,
-                    status: true,
                     visitDate: true
                 }
             },

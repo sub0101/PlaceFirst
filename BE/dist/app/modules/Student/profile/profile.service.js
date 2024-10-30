@@ -87,9 +87,25 @@ const getAllProfiles = () => __awaiter(void 0, void 0, void 0, function* () {
     });
     return response;
 });
+const getStudentInfo = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const student = yield prisma_1.default.student.findUnique({
+        where: {
+            id: id
+        },
+        include: {
+            education: true,
+            department: true,
+            course: true,
+        }
+    });
+    if (!student)
+        throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, "User Does not Exist");
+    return student;
+});
 exports.S_ProfileService = {
     getProfile,
     updateProfile,
-    getAllProfiles
+    getAllProfiles,
+    getStudentInfo
 };
 //# sourceMappingURL=profile.service.js.map

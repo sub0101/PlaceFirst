@@ -54,10 +54,20 @@ const getApplicationDetail = (0, ayncError_1.catchAsync)((req, res) => __awaiter
         data: response
     });
 }));
+const updateCompany = (0, ayncError_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield company_service_1.CompanyService.updateCompany(req.user, req.body);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Successfully Updated Company Application",
+        data: response
+    });
+}));
 exports.CompanyController = {
     getAllCompanies,
     addCompany,
     getAllApplications,
-    getApplicationDetail
+    getApplicationDetail,
+    updateCompany
 };
 //# sourceMappingURL=company.controller.js.map
