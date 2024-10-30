@@ -58,7 +58,6 @@ const getCompanyDetails = async () => { }
 
 const updateCompany = async (user:any , payload:any) => {
 
-
     const {companyApplication,company}  = payload
     console.log(company)
     console.log(companyApplication)
@@ -76,7 +75,7 @@ const updateCompany = async (user:any , payload:any) => {
             
         }
         },
-        select:{
+        select:{    
             companyApplication:true
         }
     })
@@ -160,6 +159,8 @@ const getApplication = async(user:any, comapnyId:string) =>{
 
     return response
 }
+
+
 export const CompanyService = {
     addCompany,
     getAllCompanies, 

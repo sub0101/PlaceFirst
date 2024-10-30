@@ -36,8 +36,20 @@ const getAllProfiles = catchAsync(async(req:Request , res:Response) =>{
         data:response
     })
 })
+const getStudentInfo = catchAsync( async( req:Request  ,res:Response) =>{
+    const response = await S_ProfileService.getStudentInfo(req.params.id)
+    sendResponse<any>(res , {
+        message:"SuccessFully get details",
+        success:true,
+        statusCode:201,
+        data:response
+    })
+
+})
+
 export const S_ProfileController = {
     getProfile,
     updateProfile,
-    getAllProfiles
+    getAllProfiles,
+    getStudentInfo
 }

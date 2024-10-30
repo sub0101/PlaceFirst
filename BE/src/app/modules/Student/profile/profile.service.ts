@@ -70,9 +70,27 @@ const getAllProfiles = async()=>{
 
     return response;
 }
+const getStudentInfo = async(id:string)=>{
+    
+    const student = await prisma.student.findUnique({
+        where:{
+        id:id
+        },
+        include:{
+            education:true,
+            department:true,
+            course:true,
+            
+        }
+        
+    })
+    if(!student) throw new ApiError( httpStatus.UNAUTHORIZED , "User Does not Exist")
+        return student
+}
 export const S_ProfileService = {
     getProfile,
     updateProfile,
-    getAllProfiles
+    getAllProfiles,
+    getStudentInfo
 }
 
