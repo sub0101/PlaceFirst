@@ -92,7 +92,6 @@ const getAllApplications = async(user:any )=>{
           name: true,
           industry: true,
           visitDate: true,
-        
           location: true,
           companyApplication: {
           
