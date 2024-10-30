@@ -7,14 +7,15 @@ import { getUserInfo } from '../../../utils/auth/getUserInfo';
 const { Text, Title } = Typography;
 
 export default function CompanyCard2({ company }) {
-  const { companyApplication, name: title, industry: type, date } = company;
+  const { companyApplication, name: title, industry: type, date} = company;
   const { applicants, id: companyId, ctc } = companyApplication;
   const navigate = useNavigate();
   const { id } = getUserInfo();
-  const hasApplied = applicants.some((val) => val.studentId === id);
-  const statusColor = hasApplied ? 'blue' : 'orange';
-  const statusText = hasApplied ? 'Applied' : 'Open';
+  const status =  companyApplication.status;
+  const statusColor = status ? 'blue' : 'orange';
 
+  const statusText = !(companyApplication.status )? 'Closed' : 'Open';
+console.log(companyApplication.status)
   return (
     <Card
       hoverable

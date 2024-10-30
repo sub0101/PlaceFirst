@@ -51,7 +51,7 @@ console.log(applications)
            
             <CompanyCard
               title={company.name}
-              status={company.status}
+              status={company.companyApplication.status}
               type={company.industry}
               ctc={company.companyApplication.ctc}
               date={company.date}

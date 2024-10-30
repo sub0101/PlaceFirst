@@ -17,49 +17,60 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { SaveOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { getAllDepartments } from "../../../react query/api/departments";
+import { updateCompany } from "../../../react query/api/company";
+import utc from "dayjs/plugin/utc"
+import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 const { Title } = Typography;
 const { Content } = Layout;
 const { Option } = Select;
 const { TextArea } = Input;
 
-// Custom hook for form handling
-const useFormSubmit = (initialValues) => {
-  const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-
-  const handleFinish = (values) => {
-    setLoading(true);
-   
-    
-    setTimeout(() => {
-      message.success("Company details updated successfully!");
-      setLoading(false);
-      navigate("/dashboard"); // Redirect after saving
-    }, 1500);
-  };
-
-  return { form, loading, handleFinish };
-};
-
+// dayjs.extend(utc)
 export default function EditCompanyDetails() {
+  const navigate = useNavigate()
+  const [form] = Form.useForm();
   const {data:departments , isLoading }  = useQuery({
     queryFn:getAllDepartments,
     queryKey:['departments']
   })
-  const company = useLocation().state || {}
-  const {companyApplication} = company && company
-  const { form, loading, handleFinish } = useFormSubmit({
-    // Add initial values here if needed
-  });
-  console.log(companyApplication)
+
+  const data = useLocation().state|| {}
+
+  const {companyApplication , ...company } = data
+
+  const { mutate:companyMutation, isPending , isError} = useMutation({
+    mutationFn:updateCompany,
+    mutationKey:"updateCompany",
+    onSuccess:(data)=>{
+      message.success("Sucessfully Updated data")
+      navigate('../manage-companies')
+    }
+  })
+ 
+  const handleFinish = (values) => {
+
+      const { updatedCompany, updatedCompanyApplication } = (({ name, contactEmail, contactPerson, contactPhone ,   industry, website, location, ...rest }) => ({
+       updatedCompany: { name, contactEmail, contactPerson,contactPhone, industry, website, location },
+        updatedCompanyApplication: rest,
+      }))(values);
+
+      updatedCompany.id = company.id;
+      updatedCompanyApplication.id = companyApplication.id
+      updatedCompanyApplication.pptDate = dayjs(updatedCompanyApplication.pptDate).endOf('day').utc().format().toString()
+    
+    companyMutation({company:updatedCompany , companyApplication:updatedCompanyApplication})
+      
+  
+  }
 
   return (
     <Layout className="min-h-screen bg-gray-100">
-      <Content className="py-10 px-4">
+     {company &&  <Content className="py-10 px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -78,17 +89,19 @@ export default function EditCompanyDetails() {
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Form.Item
-                  name="companyName"
+                  name="name"
                   label="Company Name"
                   rules={[
                     {
                       required: true,
                       message: "Please enter the company name",
                     },
+                    
                   
                   ]}
+                  initialValue={company?.name}
                 >
-                  <Input defaultValue={company.name} placeholder="Enter company name" />
+                  <Input placeholder="Enter company name" />
                 </Form.Item>
 
                 <Form.Item
@@ -97,21 +110,18 @@ export default function EditCompanyDetails() {
                   rules={[
                     { required: true, message: "Please enter the industry" },
                   ]}
+                  initialValue={company?.industry}
                 >
-                  <Input defaultValue={company.type} placeholder="Enter industry (e.g., Technology, Finance)" />
+                  <Input placeholder="Enter industry (e.g., Technology, Finance)" />
                 </Form.Item>
 
                 <Form.Item
                   name="website"
                   label="Website"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter the company website",
-                    },
-                  ]}
+               
+                  initialValue={company?.website}
                 >
-                  <Input defaultValue={company?.website} placeholder="Enter company website" />
+                  <Input  placeholder="Enter company website" />
                 </Form.Item>
 
                 <Form.Item
@@ -120,8 +130,9 @@ export default function EditCompanyDetails() {
                   rules={[
                     { required: true, message: "Please enter the location" },
                   ]}
+                  initialValue={company?.location}
                 >
-                  <Input defaultValue={company.location} placeholder="Enter company location" />
+                  <Input  placeholder="Enter company location" />
                 </Form.Item>
               </div>
 
@@ -137,8 +148,9 @@ export default function EditCompanyDetails() {
                       message: "Please enter the contact person",
                     },
                   ]}
+                  initialValue={company.contactPerson}
                 >
-                  <Input defaultValue={company.contactPerson} placeholder="Enter contact person name" />
+                  <Input placeholder="Enter contact person name" />
                 </Form.Item>
 
                 <Form.Item
@@ -151,8 +163,9 @@ export default function EditCompanyDetails() {
                     },
                     { type: "email", message: "Please enter a valid email" },
                   ]}
+                  initialValue={company.contactEmail}
                 >
-                  <Input defaultValue={company.contactEmail} placeholder="Enter contact email" />
+                  <Input  placeholder="Enter contact email" />
                 </Form.Item>
 
                 <Form.Item
@@ -164,8 +177,9 @@ export default function EditCompanyDetails() {
                       message: "Please enter the contact phone",
                     },
                   ]}
+                  initialValue={company.contactPhone}
                 >
-                  <Input defaultValue={company.contactPhone} placeholder="Enter contact phone" />
+                  <Input placeholder="Enter contact phone" />
                 </Form.Item>
               </div>
 
@@ -178,8 +192,9 @@ export default function EditCompanyDetails() {
                   rules={[
                     { required: true, message: "Please enter the job title" },
                   ]}
+                  initialValue={companyApplication.jobTitle}
                 >
-                  <Input defaultValue={companyApplication.jobTitle} placeholder="Enter job title (e.g., Software Engineer)" />
+                  <Input  placeholder="Enter job title (e.g., Software Engineer)" />
                 </Form.Item>
 
                 <Form.Item
@@ -191,8 +206,9 @@ export default function EditCompanyDetails() {
                       message: "Please enter the number of open roles",
                     },
                   ]}
+                  initialValue={companyApplication.openRoles}
                 >
-                  <InputNumber defaultValue={companyApplication.openRoles}
+                  <InputNumber 
                     min={1}
                     placeholder="Enter number of open roles"
                     className="w-full"
@@ -205,8 +221,9 @@ export default function EditCompanyDetails() {
                   rules={[
                     { required: true, message: "Please enter the CTC offered" },
                   ]}
+                  initialValue={companyApplication.ctc}
                 >
-                  <Input defaultValue={companyApplication.ctc} placeholder="Enter CTC (e.g., ₹10,00,000)" />
+                  <Input placeholder="Enter CTC (e.g., ₹10,00,000)" />
                 </Form.Item>
 
                 <Form.Item
@@ -219,8 +236,9 @@ export default function EditCompanyDetails() {
                       message: "Please enter the stipend amount",
                     },
                   ]}
+                  initialValue = {companyApplication.stipend}
                 >
-                  <Input defaultValue={companyApplication.stipend} placeholder="Enter stipend amount (e.g., ₹20,000/month)" />
+                  <Input  placeholder="Enter stipend amount (e.g., ₹20,000/month)" />
                 </Form.Item>
 
                 <Form.Item
@@ -232,8 +250,9 @@ export default function EditCompanyDetails() {
                       message: "Please enter the internship duration",
                     },
                   ]}
+                  initialValue={companyApplication.internshipDuration}
                 >
-                  <Input defaultValue={companyApplication.internshipDuration} placeholder="Enter internship duration (e.g., 6 months)" />
+                  <Input  placeholder="Enter internship duration (e.g., 6 months)" />
                 </Form.Item>
 
                 <Form.Item
@@ -242,14 +261,16 @@ export default function EditCompanyDetails() {
                   rules={[
                     { required: true, message: "Please enter the bond period" },
                   ]}
+                initialValue={companyApplication.bondPeriod}
                 >
-                  <Input defaultValue={companyApplication.bondPeriod} placeholder="Enter bond period (e.g., 1 year)" />
+                  <Input placeholder="Enter bond period (e.g., 1 year)" />
                 </Form.Item>
               </div>
 
               <Form.Item
                 name="jobDescription"
                 label="Job Description"
+                initialValue={companyApplication.jobDescription}
                 rules={[
                   {
                     required: true,
@@ -257,7 +278,7 @@ export default function EditCompanyDetails() {
                   },
                 ]}
               >
-                <TextArea defaultValue={companyApplication.jonDescription}
+                <TextArea 
                   rows={4}
                   placeholder="Enter detailed job description"
                 />
@@ -275,8 +296,9 @@ export default function EditCompanyDetails() {
                       message: "Please specify the recruitment mode",
                     },
                   ]}
+                  initialValue={companyApplication.recruitmentMode}
                 > 
-                  <Select defaultValue={companyApplication.recruitmentMode} placeholder="Select recruitment mode">
+                  <Select  placeholder="Select recruitment mode">
                     <Option value="Online">Online</Option>
                     <Option value="Offline">Offline</Option>
                     <Option value="Hybrid">Hybrid</Option>
@@ -292,8 +314,9 @@ export default function EditCompanyDetails() {
                       message: "Please enter the application deadline",
                     },
                   ]}
+                  initialValue={dayjs(companyApplication.applicationDeadline)}
                 >
-                  <DatePicker  className="w-full" />
+                  <DatePicker   className="w-full" />
                 </Form.Item>
 
                 <Form.Item
@@ -305,8 +328,9 @@ export default function EditCompanyDetails() {
                       message: "Please enter the interview date",
                     },
                   ]}
+                  initialValue={dayjs(companyApplication.interviewDate)}
                 >
-                  <DatePicker defaultValue= {dayjs(companyApplication.interviewDate) }className="w-full" />
+                  <DatePicker className="w-full" />
                 </Form.Item>
 
                 <Form.Item
@@ -322,14 +346,16 @@ export default function EditCompanyDetails() {
                   rules={[
                     { required: true, message: "Please enter the PPT date" },
                   ]}
+                  initialValue={dayjs(companyApplication.pptDate)}
                 >
-                  <DatePicker defaultValue={dayjs(companyApplication.pptDate) } className="w-full" />
+                  <DatePicker className="w-full" />
                 </Form.Item>
               </div>  
 
               <Form.Item
                 name="selectionProcess"
                 label="Selection Process"
+                initialValue={companyApplication.selectionProcess}
                 rules={[
                   {
                     required: true,
@@ -338,6 +364,8 @@ export default function EditCompanyDetails() {
                 ]}
               >
                 <TextArea
+             
+                
                   rows={3}
                   placeholder="Describe the selection process (e.g., Written Test, Technical Interview, HR Interview)"
                 />
@@ -348,15 +376,18 @@ export default function EditCompanyDetails() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Form.Item
                   name="eligibilityCriteria"
+                 
                   label="Eligibility Criteria"
                   rules={[
                     {
-                      required: true,
+                      // required: true,
                       message: "Please enter eligibility criteria",
                     },
                   ]}
+                  initialValue={companyApplication.eligibilityCriteria}
                 >
                   <TextArea
+           
                     rows={3}
                     placeholder="Enter eligibility criteria (e.g., Minimum 3.0 GPA, No active backlogs)"
                   />
@@ -366,6 +397,7 @@ export default function EditCompanyDetails() {
                   <Form.Item
                     name="allowedCourses"
                     label="Allowed Courses"
+                    initialValue={companyApplication.allowedCourses}
                     rules={[
                       {
                         required: true,
@@ -387,13 +419,14 @@ export default function EditCompanyDetails() {
                   <Form.Item
                     name="allowedBranches"
                     label="Allowed Branches"
-                    initialValue={companyApplication.allowedBranches}
+                  
                     rules={[
                       {
                         required: true,
                         message: "Please select allowed branches",
                       },
                     ]}
+                    initialValue={companyApplication.allowedBranches}
                   >
                     <Select
                   
@@ -418,7 +451,7 @@ export default function EditCompanyDetails() {
                 <Button
                   type="primary"
                   htmlType="submit"
-                  loading={loading}
+                  loading={isPending}
                   icon={<SaveOutlined />}
                   className="w-full md:w-1/2 h-12 text-lg"
                 >
@@ -429,6 +462,7 @@ export default function EditCompanyDetails() {
           </Card>
         </motion.div>
       </Content>
+}
     </Layout>
   );
 }

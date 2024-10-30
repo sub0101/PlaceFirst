@@ -16,7 +16,6 @@ const addCompany = async ( user:User | undefined , payload:any):Promise<any|unde
     const admin = prisma.admin.findUnique({
         where:{id:user.id}
     })
-// console.log()
     const result  = await prisma.company.create({
         data:{
             ...company,
@@ -36,7 +35,7 @@ const addCompany = async ( user:User | undefined , payload:any):Promise<any|unde
 
 }
 const getAllCompanies = async (user:any):Promise<Company[]> => {
-    console.log("getting")
+   
     const data = await prisma.company.findMany({
         include:{
             companyApplication:{
@@ -57,8 +56,33 @@ const getAllCompanies = async (user:any):Promise<Company[]> => {
 }
 const getCompanyDetails = async () => { }
 
-const updateCompany = async () => {
+const updateCompany = async (user:any , payload:any) => {
 
+
+    const {companyApplication,company}  = payload
+    console.log(company)
+    console.log(companyApplication)
+
+    const response  = await prisma.company.update({
+        where:{
+            id:company.id
+        },
+        data:{
+           
+        companyApplication:{
+           update:{
+            ...companyApplication
+           }
+            
+        }
+        },
+        select:{
+            companyApplication:true
+        }
+    })
+    console.log(response)
+    return response;
+    
 }
 
 const getAllApplications = async(user:any )=>{
@@ -69,16 +93,19 @@ const getAllApplications = async(user:any )=>{
           name: true,
           industry: true,
           visitDate: true,
-          status: true,
+        
           location: true,
           companyApplication: {
+          
             include:{
+            
                 applicants:{
                     where:{
                         studentId:id
                     },
                     select:{
                         studentId:true
+                        
                     },
                     
                 },
@@ -114,7 +141,7 @@ const getApplication = async(user:any, comapnyId:string) =>{
                     contactPerson:is_admin,
                     contactEmail:is_admin,
                     contactPhone:is_admin,
-                    status:true,
+             
                     visitDate:true
                     
                 }

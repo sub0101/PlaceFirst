@@ -27,3 +27,9 @@ export const getCompanyApplication = async(id)=>{
     console.log(response.data.data)
     return response.data.data
 }
+
+export const updateCompany = async(data) =>{
+    const response = await authAxios.patch(`${URL}` , data);
+    console.log(response.data.data)
+    return response.data.data
+}

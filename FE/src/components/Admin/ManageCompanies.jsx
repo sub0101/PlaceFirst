@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Typography,
   Select,
@@ -27,7 +27,8 @@ import { useQuery } from "@tanstack/react-query";
 import CompanyCard2 from "./company/CompanyCard2";
 import CompanyDetails from "../shared/CompanyDetails";
 import PageSkeleton from "../shared/PageSkeleton";
-
+import { useMutation } from "@tanstack/react-query";
+import { updateCompany } from "../../react query/api/company";
 const { Title } = Typography;
 const { Option } = Select;
 
@@ -36,6 +37,7 @@ const ManageCompanies = () => {
   const [visible, setVisible] = useState(false);
   const [editingCompany, setEditingCompany] = useState(null);
   const [cardVisible, setCardVisible] = useState(false);
+  const [status , setStatus] = useState(editingCompany?.companyApplication.status)
   const [company, setCompany] = useState({});
   const [form] = Form.useForm();
   const navigate = useNavigate();
@@ -48,29 +50,45 @@ const ManageCompanies = () => {
     queryKey: ["companies"],
     queryFn: getAllCompany,
   });
+  const { mutate:companyMutation, isPending , isError} = useMutation({
+    mutationFn:updateCompany,
+    mutationKey:"updateCompany",
+    onSuccess:(data)=>{
+      message.success("Sucessfully Updated data")
+    }
+  })
 
   const handleStatusUpdate = (record) => {
     setEditingCompany(record);
+  
+
+  
     setVisible(true);
   };
 
   const handleCard = (record) => {
     setCompany(record);
+  
     setCardVisible(true);
   };
 
+
   const handleSave = async () => {
-    try {
+
       const values = await form.validateFields();
-      // Update the status in the data source here, possibly via an API call
+      
       console.log(values);
-      setEditingCompany((prev) => ({ ...prev, status: values.status }));
+      const current = editingCompany;
+      editingCompany.companyApplication.status = values.status 
+      
+     companyMutation({company:{id:editingCompany.id} ,companyApplication:{status :editingCompany.companyApplication.status} })
+    
+
+  console.log(editingCompany)
+
       setVisible(false);
       form.resetFields();
-    } catch (error) {
-      console.error("Validation failed:", error);
     }
-  };
 
   const columns = [
     { 
@@ -87,11 +105,17 @@ const ManageCompanies = () => {
       title: "Status", 
       dataIndex: "status", 
       key: "status",
-      render: (status) => (
-        <Tag color={status === 'Completed' ? 'green' : status === 'Ongoing' ? 'blue' : 'orange'}>
-          {status}
-        </Tag>
-      ),
+      render: (text, record) => {
+        const status = record.companyApplication.status;
+        const value = status ? "Ongoing" : "Completed";
+      
+      
+        return (
+          <Tag color={status === true ? "green" : status === false ? "blue" : "orange"}>
+            {value}
+          </Tag>
+        );
+      }
     },
     {
       title: "CTC",
@@ -147,9 +171,9 @@ const ManageCompanies = () => {
               suffixIcon={<FilterOutlined />}
             >
               <Option value="all">All</Option>
-              <Option value="upcoming">Upcoming</Option>
-              <Option value="ongoing">Ongoing</Option>
-              <Option value="completed">Completed</Option>
+      
+              <Option  value={true} key={'ongoing'} >Ongoing</Option>
+              <Option value={false} key={'completed'} >Completed</Option>
             </Select>
             <Link to="/add-company">
               <Button type="primary" icon={<PlusOutlined />}>
@@ -182,21 +206,23 @@ const ManageCompanies = () => {
         onOk={handleSave}
         onCancel={() => setVisible(false)}
       >
+                
+
         <Form
           form={form}
-          initialValues={{
-            status: editingCompany?.status,
-          }}
+          // initialValues={{
+          // }}
         >
           <Form.Item
             name="status"
             label="Status"
             rules={[{ required: true, message: "Please select a status" }]}
+            initialValue={status }
+            
           >
             <Select>
-              <Option value="Upcoming">Upcoming</Option>
-              <Option value="Ongoing">Ongoing</Option>
-              <Option value="Completed">Completed</Option>
+            <Option  value={true} key={'ongoing'} >Ongoing</Option>
+            <Option value={false} key={'completed'} >Completed</Option>
             </Select>
           </Form.Item>
         </Form>

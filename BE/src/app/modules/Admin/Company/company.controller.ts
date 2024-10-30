@@ -50,10 +50,20 @@ const getApplicationDetail = catchAsync(async(req:Request , res:Response) =>{
         data:response
     })
 })
+const updateCompany = catchAsync(async(req:Request , res:Response) =>{
+    const response = await CompanyService.updateCompany(req.user,req.body);
+    sendResponse<any>(res , {
+        statusCode:httpStatus.OK,
+        success:true,
+        message:"Successfully Updated Company Application",
+        data:response
+    })
+})
 
 export const CompanyController = {
     getAllCompanies,
     addCompany,
     getAllApplications,
-    getApplicationDetail
+    getApplicationDetail,
+    updateCompany
 }

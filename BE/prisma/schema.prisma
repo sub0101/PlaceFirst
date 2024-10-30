@@ -14,9 +14,9 @@ datasource db {
 }
 
 enum Role {
-  STUDENT 
+  STUDENT
   ADMIN
-} 
+}
 
 model Auth {
   id       String @id @default(uuid())
@@ -27,23 +27,22 @@ model Auth {
 }
 
 model Student {
-  id         String      @id @default(uuid())
-  image String ?
-  name       String
-  contact    String?
-  studentId  String      @unique
-  email      String      @unique
-  branch     String?
-  courseId Int?
-  course     Course? @relation(fields: [courseId] , references: [id])
+  id           String      @id @default(uuid())
+  image        String?
+  name         String
+  contact      String?
+  studentId    String      @unique
+  email        String      @unique
+  branch       String?
+  courseId     Int?
+  course       Course?     @relation(fields: [courseId], references: [id])
   departmentId Int?
-  department Department? @relation(fields: [departmentId] , references: [id])
-  debarred Boolean ? @default(false)
-  status Boolean ? @default(false)
-  applicant  Applicant[]
-  education Education[]
+  department   Department? @relation(fields: [departmentId], references: [id])
+  debarred     Boolean?    @default(false)
+  status       Boolean?    @default(false)
+  applicant    Applicant[]
+  education    Education[]
 }
-
 
 model Admin {
   id       String  @id @default(uuid())
@@ -64,7 +63,6 @@ model Company {
   contactEmail       String              @unique
   contactPhone       String              @unique
   visitDate          String
-  status String? 
   addedAt            DateTime            @default(now())
   companyApplication CompanyApplication?
   createdAt          DateTime            @default(now())
@@ -72,29 +70,31 @@ model Company {
 }
 
 model CompanyApplication {
-  id                   String      @id @default(uuid())
-  companyId            String      @unique
-  company              Company     @relation(fields: [companyId], references: [id])
-    eligibilityCriteria  String?
-    studentsSelected     Int         @default(0)
-    jobTitle             String
-    jobDescription       String
-    ctc                  String?
-    stipend              String?
-    recruitmentMode      String
-    internshipDuration String?
-    bondPeriod           String?
-    openRoles            Int
-    selectionProcess     String
-    applicants           Applicant[]
-    interviewDate String?
-    pptDate String?
-    assessmentDate String?
-    tier String?
-    allowedCourses String[]
-    allowedBranches String[]
-  createdAt            DateTime    @default(now())
-  updatedAt            DateTime    @updatedAt
+  id                  String      @id @default(uuid())
+  companyId           String      @unique
+  company             Company     @relation(fields: [companyId], references: [id])
+  applicationDeadline String?
+  eligibilityCriteria String?
+  studentsSelected    Int         @default(0)
+  jobTitle            String
+  jobDescription      String
+  ctc                 String?
+  stipend             String?
+  recruitmentMode     String
+  internshipDuration  String?
+  bondPeriod          String?
+  openRoles           Int
+  selectionProcess    String
+  applicants          Applicant[]
+  interviewDate       String?
+  pptDate             String?
+  assessmentDate      String?
+  tier                String?
+  status Boolean?
+  allowedCourses      String[]
+  allowedBranches     String[]
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
 }
 
 model Applicant {
@@ -103,37 +103,33 @@ model Applicant {
   Student              Student            @relation(fields: [studentId], references: [id])
   companyApplicationId String
   CompanyApplication   CompanyApplication @relation(fields: [companyApplicationId], references: [id])
-  backlog Boolean ? @default(false)
-  cgpa Int?
-  precentage Int?
+  backlog              Boolean?           @default(false)
+  cgpa                 Int?
+  precentage           Int?
   resumeUrl            String?
-  status              String ? 
+  status               String?
   appliedAt            DateTime           @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt            DateTime           @updatedAt
 }
 
 model Education {
-  id Int @id @default(autoincrement())
-  studentId String
-  student Student @relation(fields: [studentId] , references: [id])
-  degree String
-  year String
-  institution String
+  id               Int      @id @default(autoincrement())
+  studentId        String
+  student          Student  @relation(fields: [studentId], references: [id])
+  degree           String
+  year             String
+  institution      String
   currentEducation Boolean?
-
 }
 
-
 model Department {
-  id Int @id @default(autoincrement())
-  name String
+  id      Int       @id @default(autoincrement())
+  name    String
   student Student[]
-
 }
 
 model Course {
-  id Int @id @default(autoincrement())
-  name String
+  id      Int       @id @default(autoincrement())
+  name    String
   student Student[]
 }
-
