@@ -6,6 +6,8 @@ import exp from "constants";
 import cors from "cors"
 import { isAuth } from "./app/middlewares/Auth";
 import cookieParser from "cookie-parser";
+import mongoose from "mongoose";
+import env from "./config";
 export const app = express();
 
 app.use(cors({origin:["http://localhost:5173" ,'https://place-first.vercel.app'],
@@ -32,3 +34,5 @@ app.use( ( err:any  , req:Request , res:Response , next:NextFunction) =>{
         return res.status(500).json({success:false , message:"something went Wrong"})
     }
 })
+
+mongoose.connect(env.DATABASEMONGO_URL).then(()=> console.log("mongo db conected"))

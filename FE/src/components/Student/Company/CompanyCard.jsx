@@ -44,7 +44,7 @@ const CompanyCard = ({ title, status, type, ctc, date, applicants,companyId }) =
         </Button>
         {status && (
           <Tooltip title="Apply Now">
-            <Button  disabled={hasApplied}  onClick={()=> navigate(`/application/${companyId}`)} type="default" icon={<FileAddOutlined />} block>
+            <Button    onClick={()=> navigate(`/application/${companyId}`)} type="default" icon={<FileAddOutlined />} block>
               Apply
             </Button>
           </Tooltip>

@@ -20,6 +20,8 @@ import Applicants from "./components/Admin/company/Applicants";
 import Company from "./components/Student/Company/Company";
 import StudentProfile from "./components/Student/StudentProfile";
 import StudentHomee from "./components/Student/StudentHomee";
+import StudentInfo from "./components/Admin/StudentInfo";
+import CustomApplication from "./components/Student/Application/CustomApplication";
 function App() {
   return (
     <Router>
@@ -53,6 +55,7 @@ function App() {
               <Route path="manage-users" element={<ManageUsers />} />
               <Route path="profile" element={<Profile />} />
               <Route path="add-company" element={<AddCompanyPage />} />
+              <Route path="stu_info/:id" element={<StudentInfo /> } />
               <Route
                 path="manage-companies/edit/:id"
                 element={<EditCompanyDetails />}
@@ -68,7 +71,10 @@ function App() {
               <Route path="company" element={<Company />}></Route>
               <Route path="company/details/:id" element={<CompanyDetails />} />
 
-              <Route path="/application/:id" element={<ApplicationForm />} />
+              {/* <Route path="/application/:id" element={<ApplicationForm />} />
+               */}
+                             <Route path="/application/:id" element={<CustomApplication />} />
+
               <Route path="profile" element={<StudentProfile />} />
             </Route>
           </Route>

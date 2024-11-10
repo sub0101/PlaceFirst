@@ -7,6 +7,7 @@ import JobDescriptionForm from './forms/JobDescriptionForm';
 import { addCompany } from '../../react query/api/company';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
+import CustomFormBuilder from './forms/CustomFormBuilder';
 const { Title } = Typography;
 
 const AddCompanyPage = () => {
@@ -16,22 +17,30 @@ const AddCompanyPage = () => {
   const [jobDescription , setJobDescription] = useState({})
   const [dateDetails , setdateDetails] = useState({})
   const [additionData  ,setAdditionalData] = useState({})
+  const [fields ,setFields] = useState([])
+  const[customForm , setCustomForm]  =useState([])
 
   const steps = [
+    // {title:'Fields Details' , component:<CustomFormBuilder fields={fields}  setFields={setFields} />},
+
     { title: 'Company Details', component: <CompanyDetailsForm  /> },
     { title: 'Job Description', component: <JobDescriptionForm /> },
     { title: 'Date Details', component: <DateDetailsForm  /> },
     { title: 'Additional Details', component: <AdditionalDetailsForm /> },
+    {title:'Fields Details' , component:<CustomFormBuilder fields={fields}  setFields={setFields} />},
+
+
   ];
   const [formName  ,setFormaName] = useState(steps[0].title)
   const next =async() => {
-  
   try {
 
     const values = await form.validateFields();
 
     if (currentStep === 0) {  
-      setCompanyDetail(values);
+      setCompanyDetail(values); 
+      console.log(companyDetails)
+   
     } else if (currentStep === 1) {
       setJobDescription(values);
     } else if (currentStep === 2) {
@@ -43,8 +52,6 @@ const AddCompanyPage = () => {
     setCurrentStep(currentStep + 1);
     setFormaName(steps[currentStep+1].title)
 
-console.log(values)
-
   } catch (error) {
   
     console.log("Validation failed");
@@ -55,7 +62,7 @@ console.log(values)
 
     onSuccess : (data)=>{
       console.log(data)
-      form.resetFields()
+      // form.resetFields()
       toast.success("Successfully Added")
     },
     onError:(err)=>{
@@ -72,8 +79,11 @@ console.log(values)
   
     setAdditionalData(values)
 const companyApplication = {...jobDescription , ...dateDetails , ...additionData}
+console.log(companyDetails)
+companyApplication.status  = true
+delete companyDetails.status
     const data = {
-    companyDetails , companyApplication 
+    companyDetails , companyApplication ,customForm:fields
     }
     addCompanyMutation.mutate(data)
 

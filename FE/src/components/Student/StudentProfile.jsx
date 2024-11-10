@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { Form, Input, Button, Card, Typography, Select, Divider, message, Upload, Avatar, Row, Col, Spin } from 'antd';
-import { PlusOutlined, DeleteOutlined, UserOutlined, MailOutlined, PhoneOutlined, IdcardOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, UserOutlined, MailOutlined, PhoneOutlined, IdcardOutlined, SaveOutlined } from '@ant-design/icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { getStudentProfile, updateProfile } from '../../react query/api/profile';
-import { getAllDepartments,getAllCourses } from '../../react query/api/departments';
+import { getStudentProfile, updateProfile, saveEducation } from '../../react query/api/profile';
+import { getAllDepartments, getAllCourses } from '../../react query/api/departments';
 
 const { Title } = Typography;
 const { Option } = Select;
 
 export default function StudentProfile() {
   const [imageUrl, setImageUrl] = useState(null);
-  const { control, handleSubmit, reset, formState: { errors } } = useForm({
+  const { control, handleSubmit, reset, formState: { errors }, watch } = useForm({
     defaultValues: {
       name: '',
       email: '',
@@ -38,11 +38,11 @@ export default function StudentProfile() {
     queryFn: getAllDepartments,
     queryKey: ['departments']
   });
-  const {data:fetchedCourses , isLoading:courseLoadig , isSuccess:isSuccessCourse} = useQuery({
-    queryFn:getAllCourses,
-    queryKey:['getAllCourses']
 
-  })
+  const { data: fetchedCourses, isLoading: courseLoading } = useQuery({
+    queryFn: getAllCourses,
+    queryKey: ['getAllCourses']
+  });
 
   const profileMutation = useMutation({
     mutationFn: updateProfile,
@@ -51,6 +51,16 @@ export default function StudentProfile() {
     },
     onError: () => {
       message.error('Failed to update profile');
+    }
+  });
+
+  const educationMutation = useMutation({
+    mutationFn: saveEducation,
+    onSuccess: () => {
+      message.success('Education entry saved successfully!');
+    },
+    onError: () => {
+      message.error('Failed to save education entry');
     }
   });
 
@@ -64,9 +74,14 @@ export default function StudentProfile() {
   const onSubmit = (data) => {
     const { education, ...studentInfo } = data;
     studentInfo.departmentId = Number(studentInfo.department?.id);
-    studentInfo.courseId  = Number(studentInfo.course?.id)
+    studentInfo.courseId = Number(studentInfo.course?.id);
     const finalData = { education, studentInfo };
     profileMutation.mutate(finalData);
+  };
+
+  const handleSaveEducation = (index) => {
+    const educationEntry = watch(`education.${index}`);
+    educationMutation.mutate(educationEntry);
   };
 
   const handleImageUpload = (info) => {
@@ -97,18 +112,20 @@ export default function StudentProfile() {
     { name: 'degree', label: 'Degree', placeholder: 'e.g., Bachelor of Science' },
     { name: 'institution', label: 'Institution', placeholder: 'e.g., University of Technology' },
     { name: 'year', label: 'Year', placeholder: 'e.g., 2023' },
+    { name: 'specialization', label: 'Specialization', placeholder: 'e.g., Computer Science' },
+    {name:"grade" , label :"Grade" , placeholder:"e.g.. 8.2 CGPA /80 % "}
   ];
 
-  if (isLoading) return <Spin size="large" />;
-  if (isError) return <Title level={3}>Error loading profile</Title>;
+  if (isLoading) return <Spin size="large" className="flex justify-center items-center h-screen" />;
+  if (isError) return <Title level={3} className="text-center text-red-500">Error loading profile</Title>;
 
   return (
     <Card 
-      title={<Title level={2}>Student Profile</Title>} 
-      style={{ maxWidth: 1000, margin: '0 auto' }}
+      title={<Title level={2} className="text-center">Student Profile</Title>} 
+      className="max-w-4xl mx-auto shadow-lg"
     >
-      <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
-        <Row justify="center" style={{ marginBottom: 24 }}>
+      <Form layout="vertical" onFinish={handleSubmit(onSubmit)} className="space-y-6">
+        <Row justify="center" className="mb-8">
           <Col>
             <Upload
               name="avatar"
@@ -126,9 +143,9 @@ export default function StudentProfile() {
               {imageUrl ? (
                 <Avatar size={100} src={imageUrl} />
               ) : (
-                <div>
+                <div className="flex flex-col items-center justify-center">
                   <PlusOutlined />
-                  <div style={{ marginTop: 8 }}>Upload</div>
+                  <div className="mt-2">Upload</div>
                 </div>
               )}
             </Upload>
@@ -147,7 +164,7 @@ export default function StudentProfile() {
                   validateStatus={errors.name ? 'error' : ''}
                   help={errors.name?.message}
                 >
-                  <Input {...field} prefix={<UserOutlined />} />
+                  <Input {...field} prefix={<UserOutlined />} className="rounded-md" />
                 </Form.Item>
               )}
             />
@@ -169,7 +186,7 @@ export default function StudentProfile() {
                   validateStatus={errors.email ? 'error' : ''}
                   help={errors.email?.message}
                 >
-                  <Input {...field} disabled prefix={<MailOutlined />} />
+                  <Input {...field} disabled prefix={<MailOutlined />} className="rounded-md" />
                 </Form.Item>
               )}
             />
@@ -185,7 +202,7 @@ export default function StudentProfile() {
                   validateStatus={errors.studentId ? 'error' : ''}
                   help={errors.studentId?.message}
                 >
-                  <Input {...field} disabled prefix={<IdcardOutlined />} />
+                  <Input {...field} disabled prefix={<IdcardOutlined />} className="rounded-md" />
                 </Form.Item>
               )}
             />
@@ -196,7 +213,7 @@ export default function StudentProfile() {
               control={control}
               render={({ field }) => (
                 <Form.Item label="Contact Number">
-                  <Input {...field} prefix={<PhoneOutlined />} />
+                  <Input {...field} prefix={<PhoneOutlined />} className="rounded-md" />
                 </Form.Item>
               )}
             />
@@ -207,7 +224,7 @@ export default function StudentProfile() {
               control={control}
               render={({ field }) => (
                 <Form.Item label="Branch">
-                  <Select {...field} placeholder="Select your branch">
+                  <Select {...field} placeholder="Select your branch" className="rounded-md">
                     {!departmentLoading && departments?.map((item) => (
                       <Option key={item.id} value={item.name}>{item.name}</Option> 
                     ))}
@@ -222,20 +239,17 @@ export default function StudentProfile() {
               control={control}
               render={({ field }) => (
                 <Form.Item label="Course">
-                  <Select  placeholder="Select your course"
-                  value={field.value?.name}
-                  onChange={(value, option) => {
-                    field.onChange({ id: option.key, name: value });
-                  }}
+                  <Select
+                    placeholder="Select your course"
+                    value={field.value?.name}
+                    onChange={(value, option) => {
+                      field.onChange({ id: option.key, name: value });
+                    }}
+                    className="rounded-md"
                   >
-                  {!courseLoadig && fetchedCourses?.map((item) => (
+                    {!courseLoading && fetchedCourses?.map((item) => (
                       <Option key={item.id} value={item.name}>{item.name}</Option> 
                     ))}
-                    {/* <Option value="btech">B.Tech</Option>
-                    <Option value="mtech">M.Tech</Option>
-                    <Option value="phd">Ph.D</Option>
-                    <Option value="mca">MCA</Option>
-                    <Option value="msc">MSC</Option> */}
                   </Select>
                 </Form.Item>
               )}
@@ -253,9 +267,10 @@ export default function StudentProfile() {
                     onChange={(value, option) => {
                       field.onChange({ id: option.key, name: value });
                     }}
+                    className="rounded-md"
                   >
                     {!departmentLoading && departments?.map((item) => (
-                      <Option key={item.id} value ={item.name}>{item.name}</Option> 
+                      <Option key={item.id} value={item.name}>{item.name}</Option> 
                     ))}
                   </Select>
                 </Form.Item>
@@ -264,7 +279,7 @@ export default function StudentProfile() {
           </Col>
         </Row>
 
-        <Divider orientation="left">Education</Divider>
+        <Divider orientation="left" className="text-lg font-semibold">Education</Divider>
 
         <AnimatePresence>
           {fields.map((field, index) => (
@@ -276,12 +291,29 @@ export default function StudentProfile() {
               transition={{ duration: 0.3 }}
             >
               <Card 
-                style={{ marginBottom: 16 }} 
-                extra={<DeleteOutlined onClick={() => remove(index)} />}
+                className="mb-6 shadow-md" 
+                title={`Education ${index + 1}`}
+                extra={
+                  <div className="flex space-x-2">
+                    <Button 
+                      onClick={() => handleSaveEducation(index)}
+                      icon={<SaveOutlined />}
+                      type="primary"
+                      ghost
+                    >
+                      Save
+                    </Button>
+                    <Button 
+                      onClick={() => remove(index)}
+                      icon={<DeleteOutlined />}
+                      danger
+                    />
+                  </div>
+                }
               >
                 <Row gutter={[16, 16]}>
                   {educationFields.map((eduField) => (
-                    <Col xs={24} sm={8} key={eduField.name}>
+                    <Col xs={24} sm={12} key={eduField.name}>
                       <Controller
                         name={`education.${index}.${eduField.name}`}
                         control={control}
@@ -292,7 +324,7 @@ export default function StudentProfile() {
                             validateStatus={errors.education?.[index]?.[eduField.name] ? 'error' : ''}
                             help={errors.education?.[index]?.[eduField.name]?.message}
                           >
-                            <Input {...field} placeholder={eduField.placeholder} />
+                            <Input {...field} placeholder={eduField.placeholder} className="rounded-md" />
                           </Form.Item>
                         )}
                       />
@@ -305,16 +337,16 @@ export default function StudentProfile() {
         </AnimatePresence>
         <Button 
           type="dashed" 
-          onClick={() => append({ degree: '', institution: '', year: '' })} 
+          onClick={() => append({ degree: '', institution: '', year: '', specialization: '' })} 
           block 
           icon={<PlusOutlined />}
-          style={{ marginBottom: 16 }}
+          className="mb-6"
         >
           Add Education
         </Button>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" size="large" block>
+          <Button type="primary" htmlType="submit" size="large" block className="h-12 text-lg font-semibold">
             Update Profile
           </Button>
         </Form.Item>

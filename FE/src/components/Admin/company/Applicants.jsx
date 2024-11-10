@@ -1,116 +1,182 @@
-import React, { useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
-import { Table, Typography, Input, Button, Space, Layout, Card, Tag, Avatar, Select } from 'antd';
-import { SearchOutlined, UserOutlined, MailOutlined, PhoneOutlined, BookOutlined, BranchesOutlined } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
-import { getApplicants } from '../../../react query/api/applicants';
+import React, { useState, useMemo, useCallback } from 'react';
+import { useParams } from 'react-router-dom';
+import { Table, Typography, Layout, Card, Select, message, Button, Input, Space } from 'antd';
+import { FileExcelOutlined, SearchOutlined } from '@ant-design/icons';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getApplicants, updateApplicant } from '../../../react query/api/applicants';
 import PageSkeleton from '../../shared/PageSkeleton';
+import { exportToExcel } from '../../../helper/exportToExcel';
+import { filterKeys } from '../../../helper/filteredkeys';
 
 const { Title, Text } = Typography;
 const { Content } = Layout;
 const { Option } = Select;
 
-const Applicants = () => {
+export default function Applicants() {
   const { id: companyId } = useParams();
-  console.log(companyId)
-  const location = useLocation();
-  const { companyApplication } = location.state || {};
+  const queryClient = useQueryClient();
 
-  const [searchText, setSearchText] = useState('');
-  const [filterBranch, setFilterBranch] = useState('');
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [bulkStatus, setBulkStatus] = useState('');
 
-  const { data: applicants, isLoading, isError } = useQuery({
-    queryFn: ()=>getApplicants(companyId),
-    queryKey: ["applicants"]
+  const { data: applicants = [], isLoading, isError } = useQuery({
+    queryKey: ["applicants", companyId],
+    queryFn: () => getApplicants(companyId),
+    enabled: !!companyId,
   });
 
-  const columns = [
-    {
-      title: 'Applicant',
-      dataIndex: 'name',
-      key: 'name',
-      render: (text, record) => (
-        <Space>
-          <Avatar icon={<UserOutlined />} />
-          <Text strong>{record.Student.name}</Text>
-        </Space>
-      ),
+  const updateStatusMutation = useMutation({
+    mutationFn: updateApplicant,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["applicants", companyId]);
+      message.success('Status updated successfully');
     },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
-      render: (text, record) => (
+    onError: () => {
+      message.error('Failed to update status');
+    }
+  });
+
+  const handleStatusChange = useCallback((applicantId, newStatus) => {
+    updateStatusMutation.mutate({ id: applicantId, status: newStatus });
+  }, [updateStatusMutation]);
+
+  const exportExcel = useCallback(() => {
+    const data = applicants.map(info => ({
+      ...info,
+      ...Object.entries(info).reduce((acc, [key, value]) => {
+        if (typeof value === 'object' && value !== null) {
+          Object.entries(value).forEach(([subKey, subValue]) => {
+            acc[`${key}_${subKey}`] = subValue;
+          });
+        }
+        return acc;
+      }, {})
+    }));
+    const filteredData = filterKeys(data);
+    exportToExcel(filteredData, "Applicants");
+  }, [applicants]);
+
+  const getColumnSearchProps = useCallback((dataIndex) => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => confirm()}
+          style={{ width: 188, marginBottom: 8, display: 'block' }}
+        />
         <Space>
-          <MailOutlined />
-          <Text>{record.Student.email}</Text>
+          <Button
+            type="primary"
+            onClick={() => confirm()}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+          <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
+            Reset
+          </Button>
         </Space>
-      ),
+      </div>
+    ),
+    filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+    onFilter: (value, record) => {
+      if (typeof dataIndex === 'string') {
+        return record[dataIndex]
+          ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+          : '';
+      }
+      const [objKey, nestedKey] = dataIndex;
+      return record[objKey] && record[objKey][nestedKey]
+        ? record[objKey][nestedKey].toString().toLowerCase().includes(value.toLowerCase())
+        : '';
     },
-    {
-      title: 'Phone',
-      dataIndex: 'phone',
-      key: 'phone',
-      render: (text, record) => (
-        <Space>
-          <PhoneOutlined />
-          <Text>{record.Student.contact}</Text>
-        </Space>
-      ),
-    },
-    {
-      title: 'Enrollment',
-      dataIndex: 'enrollment',
-      key: 'enrollment',
-      render: (text, record) => (
-        <Space>
-          <BookOutlined />
-          <Text>{String(record.Student.studentId).toUpperCase()}</Text>
-        </Space>
-      ),
-    },
-    {
-      title: 'Branch',
-      dataIndex: 'branch',
-      key: 'branch',
-      render: (text, record) => (
-        <Space>
-          <BranchesOutlined />
-          <Text>{record.Student.branch.toUpperCase()}</Text>
-        </Space>
-      ),
-    },
-    {
+  }), []);
+
+  const columns = useMemo(() => {
+    if (applicants.length === 0) return [];
+
+    const sampleApplicant = applicants[0];
+    const baseColumns = Object.keys(sampleApplicant).filter(key => typeof sampleApplicant[key] !== 'object').map(key => ({
+      title: key.charAt(0).toUpperCase() + key.slice(1),
+      dataIndex: key,
+      key: key,
+      sorter: (a, b) => {
+        if (typeof a[key] === 'string') return a[key].localeCompare(b[key]);
+        return a[key] - b[key];
+      },
+      ...getColumnSearchProps(key),
+    }));
+
+    const nestedColumns = Object.entries(sampleApplicant)
+      .filter(([_, value]) => typeof value === 'object' && value !== null)
+      .flatMap(([objectKey, objectValue]) => 
+        Object.keys(objectValue).map(key => ({
+          title: `${objectKey} ${key.charAt(0).toUpperCase() + key.slice(1)}`,
+          dataIndex: [objectKey, key],
+          key: `${objectKey}_${key}`,
+          render: (text, record) => record[objectKey] ? record[objectKey][key] : '',
+          sorter: (a, b) => {
+            const aValue = a[objectKey] ? a[objectKey][key] : '';
+            const bValue = b[objectKey] ? b[objectKey][key] : '';
+            if (typeof aValue === 'string') return aValue.localeCompare(bValue);
+            return aValue - bValue;
+          },
+          ...getColumnSearchProps([objectKey, key]),
+        }))
+      );
+
+    return [...baseColumns, ...nestedColumns, {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => {
-        let color = 'blue';
-        if (status === 'Accepted') color = 'green';
-        if (status === 'Rejected') color = 'red';
-        if (status === 'Interviewed') color = 'orange';
-        return <Tag color={color}>{status}</Tag>;
-      },
-    },
-    {
-      title: 'Action',
-      key: 'action',
-      render: (_, record) => (
-        <Button type="link" onClick={() => console.log('View applicant:', record.id)}>
-          View Details
-        </Button>
+      render: (status, record) => (
+        <Select
+          value={status}
+          onChange={(value) => handleStatusChange(record.id, value)}
+          style={{ width: 120 }}
+          loading={updateStatusMutation.isLoading}
+        >
+          <Option value="pending">Pending</Option>
+          <Option value="interviewed">Interviewed</Option>  
+          <Option value="accepted">Accepted</Option>
+          <Option value="rejected">Rejected</Option>
+        </Select>
       ),
-    },
-  ];
+    }];
+  }, [applicants, getColumnSearchProps, handleStatusChange, updateStatusMutation.isLoading]);
 
-  const filteredApplicants = applicants?.filter(
-    (applicant) =>
-      (applicant.Student.name.toLowerCase().includes(searchText.toLowerCase()) ||
-        applicant.Student.email.toLowerCase().includes(searchText.toLowerCase()) ||
-        applicant.Student.contact.includes(searchText) ||
-        String(applicant.Student.studentId).toLowerCase().includes(searchText.toLowerCase())) &&
-      (filterBranch === '' || applicant.Student.branch.toLowerCase() === filterBranch.toLowerCase())
-  );
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: setSelectedRowKeys,
+    selections: [
+      Table.SELECTION_ALL,
+      Table.SELECTION_INVERT,
+      Table.SELECTION_NONE,
+    ],
+  };
+
+  const handleBulkStatusUpdate = useCallback(() => {
+    if (selectedRowKeys.length === 0 || !bulkStatus) {
+      message.warning('Please select applicants and a status to update');
+      return;
+    }
+
+    Promise.all(
+      selectedRowKeys.map(key => 
+        updateStatusMutation.mutateAsync({ id: key, status: bulkStatus })
+      )
+    ).then(() => {
+      message.success(`Updated ${selectedRowKeys.length} applicants to ${bulkStatus}`);
+      setSelectedRowKeys([]);
+      setBulkStatus('');
+    }).catch(() => {
+      message.error('Failed to update some applicants');
+    });
+  }, [selectedRowKeys, bulkStatus, updateStatusMutation]);
 
   if (isLoading) {
     return <PageSkeleton layout="table" itemCount={10} />;
@@ -132,46 +198,49 @@ const Applicants = () => {
     <Layout className="min-h-screen bg-gray-100">
       <Content className="p-4 sm:p-6 lg:p-8">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
+          <Button icon={<FileExcelOutlined />} onClick={exportExcel}>Export to Excel</Button>
           <Title level={2} className="mb-4 sm:mb-0">Applicants List</Title>
           <Text strong className="mb-4 sm:mb-0">
-            Total Applicants: {applicants?.length || 0}
+            Total Applicants: {applicants.length || 0}
           </Text>
         </div>
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 space-y-4 sm:space-y-0 sm:space-x-4">
-          <Input
-            placeholder="Search applicants"
-            prefix={<SearchOutlined />}
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            className="w-full sm:w-64"
-          />
+        
+        <div className="mb-4 flex items-center">
           <Select
-            placeholder="Filter by Branch"
-            style={{ width: '100%', maxWidth: '200px' }}
-            onChange={(value) => setFilterBranch(value)}
-            allowClear
+            placeholder="Select status for bulk update"
+            style={{ width: 200, marginRight: 16 }}
+            value={bulkStatus}
+            onChange={setBulkStatus}
           >
-            <Option value="">All Branches</Option>
-            <Option value="MCA">MCA</Option>
-            <Option value="CSE">CSE</Option>
-            <Option value="ECE">ECE</Option>
+            <Option value="pending">Pending</Option>
+            <Option value="interviewed">Interviewed</Option>
+            <Option value="accepted">Accepted</Option>
+            <Option value="rejected">Rejected</Option>
           </Select>
+          <Button 
+            type="primary"
+            onClick={handleBulkStatusUpdate}
+            disabled={selectedRowKeys.length === 0 || !bulkStatus}
+          >
+            Update Selected ({selectedRowKeys.length})
+          </Button>
         </div>
-        <Table
-          columns={columns}
-          dataSource={filteredApplicants}
-          rowKey={(record) => record.Student.studentId}
-          pagination={{
-            pageSize: 10,
-            showSizeChanger: true,
-            showQuickJumper: true,
-          }}
-          scroll={{ x: 'max-content' }}
-          className="overflow-x-auto"
-        />
+
+        <Card className="overflow-x-auto">
+          <Table
+            rowSelection={rowSelection}
+            columns={columns}
+            dataSource={applicants}
+            rowKey={(record) => record.id}
+            pagination={{
+              pageSize: 10,
+              showSizeChanger: true,
+              showQuickJumper: true,
+            }}
+            scroll={{ x: 'max-content' }}
+          />
+        </Card>
       </Content>
     </Layout>
   );
-};
-
-export default Applicants;
+}

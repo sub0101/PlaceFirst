@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Input, Select, Button, Typography, Space, Tag, Spin } from 'antd';
-import { SearchOutlined, UserAddOutlined } from '@ant-design/icons';
+import { ExceptionOutlined, FileExcelFilled, FileExcelOutlined, SearchOutlined, UserAddOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getAllStudents } from '../../react query/api/profile';
 import { getAllCourses,getAllDepartments } from '../../react query/api/departments';
+import { exportToExcel } from '../../helper/exportToExcel';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -29,7 +30,18 @@ export default function ManageUsers() {
     queryFn: getAllCourses,
     queryKey: ['getAllCourses'],
   });
-
+  const exportExcel = async () => {
+  
+   let  result = students.map((info) => ({
+      ...(info.Student),
+      ...info,
+      Enrollment:info.Student.studentId,
+      department: info.Student.department.name,
+      course: info.Student.course.name,
+    }));
+ result = filterKeys(result)
+    exportToExcel(result, "Users");
+  }
   useEffect(() => {
     if (students) {
       const filtered = students.filter(student => 
@@ -47,7 +59,7 @@ export default function ManageUsers() {
       dataIndex: 'name',
       key: 'name',
       render: (text, record) => (
-        <Link href={`/student/${record.id}`} className="text-blue-600 hover:text-blue-800">
+        <Link to={`../stu_info/${record.id}`} className="text-blue-600 hover:text-blue-800">
           {text}
         </Link>
       ),
@@ -121,10 +133,11 @@ export default function ManageUsers() {
             />
             <Button 
               type="primary" 
-              icon={<UserAddOutlined />} 
+              icon={<FileExcelOutlined />} 
+              onClick={()=> exportToExcel(filteredStudents ,"users") }
               className="bg-indigo-600 hover:bg-indigo-700 text-white w-full sm:w-auto"
             >
-              Add New Student
+    
             </Button>
           </Space>
         </div>

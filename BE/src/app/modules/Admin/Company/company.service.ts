@@ -4,14 +4,38 @@ import { User } from "../../../../interfaces"
 import ApiError from "../../../../Error/ApiError"
 import { AuthUser } from "../../../../enums"
 import { app } from "../../../../app"
+import mongoose from "mongoose"
+import { Model } from "mongoose"
+import { formSchema } from "../../../../config/database"
 
+const addForm = async(payload:any , id:string)=>{
+    console.log("adding applicant")
+    console.log(payload)
+    console.log(id)
+    const CustomFormModel:Model<any> = mongoose.model('CustomForm' , formSchema)
+   
+    const form = new CustomFormModel({
+        companyApplicationId:id,
+        fields: payload
+    })
+    await form.save();
+    console.log(form)
+    return form
+}
+const getForm = async()=>{
+    const CustomFormModel:Model<any> = mongoose.model('CustomForm' , formSchema)
 
+const response:any =  await CustomFormModel.find({})
+console.log(response)
+console.log(response[0])
+return response[0].fields;
+}
 
 
 const addCompany = async ( user:User | undefined , payload:any):Promise<any|undefined> => {
     if(!user) throw new ApiError(401 , "user Does not exist")
         console.log(payload)
-    const {companyDetails:company , companyApplication} = payload
+    const {companyDetails:company , companyApplication,customForm} = payload
 
     const admin = prisma.admin.findUnique({
         where:{id:user.id}
@@ -30,6 +54,8 @@ const addCompany = async ( user:User | undefined , payload:any):Promise<any|unde
         }
     
     })
+
+    addForm(customForm,result?.companyApplication?.id || "")
     
    return result;
 
@@ -166,5 +192,7 @@ export const CompanyService = {
     getCompanyDetails,
     updateCompany,
     getAllApplications,
-    getApplication
+    getApplication,
+    addForm,
+    getForm
 }

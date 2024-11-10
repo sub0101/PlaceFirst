@@ -108,7 +108,7 @@ model Applicant {
   cgpa                 Int?
   precentage           Int?
   resumeUrl            String?
-  status               String?
+  status               String? @default("applied")
   appliedAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
 }
@@ -117,11 +117,11 @@ model Education {
   id               Int      @id @default(autoincrement())
   studentId        String
   student          Student  @relation(fields: [studentId], references: [id])
-  cgpa Float?
-  precentage Float?
+  grade Float?
   degree           String
   year             String
   institution      String
+  specialization String?
   currentEducation Boolean?
 }
 

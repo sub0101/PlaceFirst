@@ -13,7 +13,8 @@ const envSchema = z.object({
     CLOUDINARY_NAME :z.string(),
     CLOUDINARY_SECRET_KEY:z.string(),
     CLOUDINARY_KEY:z.string(),
-    ACCESS_TOKEN_SECRET:z.string()
+    ACCESS_TOKEN_SECRET:z.string(),
+    DATABASEMONGO_URL:z.string().url()
 
 
 })

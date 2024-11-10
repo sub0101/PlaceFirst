@@ -9,3 +9,9 @@ export const getApplicants = async(id) =>{
     console.log(response.data.data)
     return response.data.data;
 }
+export const updateApplicant = async(data) =>{
+    console.log(data)
+    const response = await authAxios.patch(URL , data)
+    console.log(response.data.data)
+    return response.data.data
+}

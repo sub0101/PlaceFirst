@@ -14,7 +14,20 @@ const getApplicants = catchAsync(async(req:Request , res:Response) =>{
         data:response
     })
 })
+const updateApplicant = catchAsync(async(req:Request , res:Response) =>{
+
+    // const params:string = req.params.id;
+
+    const response = await ApplicantService.updateApplicant(req.body , req.body)
+    sendResponse<any>(res ,{
+        message:"Successfully feched Applicants",
+        success:true,
+        statusCode:200,
+        data:response
+    })
+})
 
 export const ApplicantsController = {
-    getApplicants
+    getApplicants,
+    updateApplicant
 }

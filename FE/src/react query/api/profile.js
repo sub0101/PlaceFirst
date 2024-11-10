@@ -22,6 +22,15 @@ export const getAllStudents = async() =>{
 
 export const getAdminProfile = async()=>{
     const response = await authAxios.get(A_URL);
-    console.log(response.data.data)
+    console.log(response.data.data) 
     return response.data.data;
+}
+
+export const getStudentInfo = async(id)=>{
+    const response  = await authAxios.get(`${S_URL}/info/${id}`);
+    console.log(response.data.data)
+    return response.data.data
+}
+export const saveEducation = ()=>{
+    // const response = await authAxios.patch('${S_URL}')
 }

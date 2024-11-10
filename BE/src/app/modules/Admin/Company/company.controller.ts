@@ -60,10 +60,32 @@ const updateCompany = catchAsync(async(req:Request , res:Response) =>{
     })
 })
 
+const addForm = catchAsync(async(req:Request , res:Response) =>{
+    // const response  = await CompanyService.addForm(req.body) ;
+    // sendResponse<any>(res , {
+    //     statusCode:httpStatus.OK,
+    //     success:true,
+    //     message:"Successfully added Company Application",
+    //     data:response
+    // })
+})
+
+const getForm = catchAsync(async(req:Request , res:Response) =>{
+    const response  = await CompanyService.getForm() ;
+    sendResponse<any>(res , {
+        statusCode:httpStatus.OK,
+        success:true,
+        message:"Successfully added Company Application",
+        data:response
+    })
+})
+
 export const CompanyController = {
     getAllCompanies,
     addCompany,
     getAllApplications,
     getApplicationDetail,
-    updateCompany
+    updateCompany,
+    addForm,
+    getForm
 }

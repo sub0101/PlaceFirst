@@ -21,5 +21,6 @@ router.use("/applicants" , ApplicantRouter)
 router.use('/department' , DepartmentRouter)
 router.use('/course' , CourseRouter)
 router.use('/stats'  ,StatsRouter)
+router.use('/form' , CompanyRouter)
 
 export default router

@@ -23,7 +23,6 @@ const updateProfile = async(user:any , data:any) =>{
     // console.log(user)
     const {studentInfo , education} = data
     const {departmentId ,department, courseId, course , ...updateData } = studentInfo
-    console.log(updateData)
     const student = await  prisma.student.update({
        data:{
         ...updateData,
@@ -34,33 +33,43 @@ const updateProfile = async(user:any , data:any) =>{
             id:user.id
         }
     })
-    // await prisma.education.create({
-    //     data: {
-    //         degree: 'Bachelor of Science',
-    //         institution: 'University X',
-    //         year:"1022",
-    //         currentEducation:false,
-    //         student: {
-    //           connect: { id: student.id }, 
-    //         },
-    //       }
-    // })
-    // if(education.length > 0) {
-    //     console.log(education)
-    //     await prisma.student.crea({
-    //         where:{
-    //             studentId:user.id
-    //         },
-    //         data:{
-    //            education:education
-    //         }
-    //     })
-    // }
+    if(education.length>0) {
+
+        await prisma.student.update({
+            where: { id: user.id },
+            data: {
+              education: {
+            
+                upsert: education.map((ed:any) => ({
+                  where: { id: ed.id || 0 }, 
+                  update: {
+                    
+                            degree: ed.degree,
+                            institution: ed.institution,
+                            year: ed.year,
+                            currentEducation:ed.currentEducation,
+                            grade: parseFloat(ed.grade),
+                        specialization:ed.specialization
+                  },
+                  create: {
+                    degree: ed.degree,
+                    institution: ed.institution,
+                    year: ed.year,
+                    currentEducation:ed.currentEducation,
+                    grade: parseFloat(ed.grade),
+                specialization:ed.specialization
+                  },
+                
+                }))
+              },
+            
+            }})
+    }
+    
     return student
 }
 
 const getAllProfiles = async()=>{
-
     const response  = await prisma.student.findMany({
         include:{
             department:true,
@@ -86,6 +95,15 @@ const getStudentInfo = async(id:string)=>{
     })
     if(!student) throw new ApiError( httpStatus.UNAUTHORIZED , "User Does not Exist")
         return student
+}
+
+const deleteEducation  = async(id:number) =>{
+    const respone = await prisma.education.delete({
+    where:{
+        id:id
+    }
+    })
+    return respone;
 }
 export const S_ProfileService = {
     getProfile,

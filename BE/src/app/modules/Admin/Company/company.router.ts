@@ -11,6 +11,9 @@ router.get("/applications" ,isAuth(AuthUser.STUDENT) , CompanyController.getAllA
 router.get('/:id' , isAuth(AuthUser.ADMIN , AuthUser.STUDENT) , CompanyController.getApplicationDetail)
 router.post("/" , isAuth(AuthUser.ADMIN) , CompanyController.addCompany)
 router.patch('/' , isAuth(AuthUser.ADMIN) ,CompanyController.updateCompany)
+router.post('/addForm' ,CompanyController.addForm )
+router.post('/getForm' ,CompanyController.getForm )
+
 
 
 export const CompanyRouter = router
