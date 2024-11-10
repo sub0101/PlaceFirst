@@ -11,7 +11,6 @@ import { CourseRouter } from "../modules/Admin/course/course.routes";
 import { StatsRouter } from "../modules/Admin/statistics/stats.routes";
 const router = express.Router()
 
-
 router.use("/auth" ,AuthRouter )
 router.use("/company"  , CompanyRouter)
 router.use("/s_profile" , S_ProfileRouter)
