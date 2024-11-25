@@ -27,7 +27,7 @@ export async function  register(data) {
 
 export async function sendOtp(info) {
 
-  const response = await unAuthAxios.post(`${URL}/sendOTP` , {email:info.email , enrollment:info.id})
+  const response = await unAuthAxios.post(`${URL}/send-otp` , {email:info.email , enrollment:info.id})
   console.log(response.data)
   return response.data.data
 }
