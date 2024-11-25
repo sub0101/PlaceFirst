@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon src/index.ts",
-    "build": "prisma generate && npm install @prisma/client && tsc",
+    "build": "prisma generate && npm build",
     "postinstall": "prisma generate && npm install @prisma/client",
     "ts.check": "tsc --project tsconfig.json",
     "add-build": "git add dist",
