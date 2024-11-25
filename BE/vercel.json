@@ -20,8 +20,5 @@
         }
       }
     ]
-    ,
-    "env": {
-      "PRISMA_QUERY_ENGINE_LIBRARY": "node-api"
-    }
+    
   }
