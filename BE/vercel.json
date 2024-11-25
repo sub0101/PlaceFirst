@@ -4,10 +4,7 @@
       {
         "src": "dist/index.js",
         "use": "@vercel/node",
-        "config": { "includeFiles": ["dist/**"] },
-        "env": {
-      "ENABLE_VC_BUILD_CACHE": "false"
-    }
+        "config": { "includeFiles": ["dist/**"] }
       }
     ],
     "routes": [
@@ -23,5 +20,8 @@
         }
       }
     ]
-
+    ,
+    "env": {
+      "PRISMA_QUERY_ENGINE_LIBRARY": "node-api"
+    }
   }
