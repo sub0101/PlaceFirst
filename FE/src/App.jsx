@@ -22,6 +22,8 @@ import StudentProfile from "./components/Student/StudentProfile";
 import StudentHomee from "./components/Student/StudentHomee";
 import StudentInfo from "./components/Admin/StudentInfo";
 import CustomApplication from "./components/Student/Application/CustomApplication";
+import OTPVerification from "./components/Auth/OTPVerification";
+import Applications from "./components/Student/Applications";
 function App() {
   return (
     <Router>
@@ -39,9 +41,12 @@ function App() {
           element={
             <ProtectedLogin>
               <StudentRegistration />
+
             </ProtectedLogin>
           }
+
         />
+        <Route path="/verify-otp" element={<OTPVerification />} />
 
         <Route element={<PrivateOutlet />}>
           <Route element={<Home requiredRole={"Admin"} />}>
@@ -76,6 +81,8 @@ function App() {
                              <Route path="/application/:id" element={<CustomApplication />} />
 
               <Route path="profile" element={<StudentProfile />} />
+              <Route path="applications" element={<Applications />} />
+             
             </Route>
           </Route>
 

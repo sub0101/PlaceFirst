@@ -73,7 +73,8 @@ const getAllProfiles = async()=>{
     const response  = await prisma.student.findMany({
         include:{
             department:true,
-            course:true
+            course:true,
+            
         }
     });
 
@@ -95,7 +96,7 @@ const getStudentInfo = async(id:string)=>{
     })
     if(!student) throw new ApiError( httpStatus.UNAUTHORIZED , "User Does not Exist")
         return student
-}
+} 
 
 const deleteEducation  = async(id:number) =>{
     const respone = await prisma.education.delete({

@@ -40,9 +40,9 @@ const StudentPage = () => {
   const menuItems = [
     { key: '/', icon: <HomeOutlined />, label: 'Home' },
     { key: '/company', icon: <BuildOutlined />, label: 'Company' },
-    { key: '/applied', icon: <CheckCircleOutlined />, label: 'Applied' },
+    // { key: '/applied', icon: <CheckCircleOutlined />, label: 'Applied' },
     { key: '/profile', icon: <UserOutlined />, label: 'Profile' },
-    { key: '/application-tracker', icon: <FileTextOutlined />, label: 'Application Tracker' },
+    { key: '/applications', icon: <FileTextOutlined />, label: 'Application Tracker' },
   ];
 
   const SideMenu = () => (

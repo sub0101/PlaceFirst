@@ -27,3 +27,15 @@ export const  getAllCourses  = async()=>{
     console.log(response.data.data)
     return response.data.data;
 }
+
+export const removeDepartment = async(id) =>{
+    const response   = await authAxios.delete(`${URL}/${id}`)
+    return response.data.data;
+    
+}
+export const removeCourse = async(id) =>{
+    const response   = await authAxios.delete(`${URL2}/${id}`)
+    return response.data.data
+
+    
+}

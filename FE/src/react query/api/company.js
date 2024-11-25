@@ -33,3 +33,14 @@ export const updateCompany = async(data) =>{
     console.log(response.data.data)
     return response.data.data
 }
+export const updateCompanyStatus = async(status)=>{
+     const response = await authAxios.patch(`${URL}/status` , status);
+     console.log(response.data.data)
+     return response.data.data
+
+}
+
+export const getAppliedCompany = async()=>{
+    const response  = await authAxios.get(`${URL}/applied_companies`);
+    return response.data.data
+}

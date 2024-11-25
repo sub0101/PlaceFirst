@@ -6,14 +6,14 @@ import { getUserInfo } from '../../../utils/auth/getUserInfo';
 
 const { Text, Title } = Typography;
 
-const CompanyCard = ({ title, status, type, ctc, date, applicants,companyId }) => {
+const CompanyCard = ({ title, status, type, ctc, date, applicants,companyId,canApply:hasApplied }) => {
  
  
   const navigate = useNavigate();
   const {id} = getUserInfo()
-  const hasApplied = applicants && applicants.some((val) => val.studentId === id);
-  const statusColor = hasApplied ? 'blue' : 'red';
-  const statusText = hasApplied ? 'Applied' : 'Not Applied';
+  // const hasApplied = applicants && applicants.some((val) => val.studentId === id);
+  const statusColor = status ? 'blue' : 'red';
+  const statusText = status ? 'Open' : 'Closed';
 
   return (
     <Card
@@ -42,9 +42,9 @@ const CompanyCard = ({ title, status, type, ctc, date, applicants,companyId }) =
         <Button type="primary" icon={<ArrowRightOutlined />} onClick={() => navigate(`./details/${companyId}`)} block>
           {status === 'ongoing' ? 'View Application' : 'View Details'}
         </Button>
-        {status && (
+        {true && (
           <Tooltip title="Apply Now">
-            <Button    onClick={()=> navigate(`/application/${companyId}`)} type="default" icon={<FileAddOutlined />} block>
+            <Button disabled={hasApplied}   onClick={()=> navigate(`/application/${companyId}`)} type="default" icon={<FileAddOutlined />} block>
               Apply
             </Button>
           </Tooltip>

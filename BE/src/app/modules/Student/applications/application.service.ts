@@ -5,13 +5,16 @@ import { app } from "../../../../app";
 import ApiError from "../../../../Error/ApiError";
 import httpStatus from "http-status";
 import mongoose, { Model } from "mongoose";
-import { ApplicantSchema } from "../../../../config/database";
+import { ApplicantModel } from "../../../../config/database"
+import { mailSender } from "../../../../utils/mailer";
+import { successfully_applied } from "../../../../utils/mailBody";
 
 const createApplication = async(user:any , data:any)=>{
-
-    // const application = null
+const {id } = user
     
-    const ApplicantModel:Model<any> = mongoose.model('applicantSchema'  , ApplicantSchema)
+    const student =  await prisma.student.findUnique({where:{id:id}})
+
+    if(!student) throw new ApiError(401 , "User Does Not Exist")
     const isApplicationExist = await ApplicantModel.findOne({
         studentId:data.studentId,
         companyApplicationId :data.companyApplicationId
@@ -23,6 +26,7 @@ const createApplication = async(user:any , data:any)=>{
         ...data
     })
     console.log(respone)
+    mailSender(student?.email , "Application Successful!" ,await successfully_applied(student.name , student.email , ""))
     return respone;
     // const {cgpa , backlog,precentage,studentId , companyId } = data
     // const isExist = await prisma.applicant.findFirst({

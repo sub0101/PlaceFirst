@@ -37,7 +37,7 @@ const ManageCompanies = () => {
   const [visible, setVisible] = useState(false);
   const [editingCompany, setEditingCompany] = useState(null);
   const [cardVisible, setCardVisible] = useState(false);
-  const [status , setStatus] = useState(editingCompany?.companyApplication.status)
+  const [status , setStatus] = useState(editingCompany?.companyApplication.applicationStatus)
   const [company, setCompany] = useState({});
   const [form] = Form.useForm();
   const navigate = useNavigate();

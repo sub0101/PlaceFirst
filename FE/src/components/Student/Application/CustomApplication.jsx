@@ -80,7 +80,7 @@ const CustomApplication = () => {
   const handleSubmit = (values) => {
     // onSubmit(values);
     console.log(values)
-    values.companyApplicatinId = companyid
+    values.companyApplicationId = companyid
     values.studentId = studentId;
     applicationMutation.mutate(values)
 

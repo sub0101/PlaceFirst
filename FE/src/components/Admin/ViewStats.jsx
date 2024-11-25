@@ -138,7 +138,13 @@ if(isSuccess) console.log(placementStats)
              >
                <span className="font-semibold">{stat.shortName}</span>
                <span>Placed: {stat.totalPlaced} / Total: {stat.totalStudent}</span>
-               <span className="text-green-500">{((stat.totalPlaced / stat.totalStudent) * 100).toFixed(2)}%</span>
+               <span className="text-green-500">{ 
+               
+               stat?.totalStudent 
+               ? `${Number(((stat?.totalPlaced / stat?.totalStudent) * 100).toFixed(2))}` 
+               : '0'
+               
+               }%</span>
              </motion.div>
            ))}
          </motion.div>

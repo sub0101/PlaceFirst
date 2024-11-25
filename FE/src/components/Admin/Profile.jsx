@@ -1,83 +1,116 @@
 'use client'
 
-import { useState } from 'react'
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import PageSkeleton from '../shared/PageSkeleton'
-import { Form, Input, Button, List, Typography, Collapse, message, Skeleton } from 'antd'
-import { PlusOutlined, UserOutlined, MailOutlined, PhoneOutlined, IdcardOutlined, TeamOutlined } from '@ant-design/icons'
-import { useMutation, useQueries, useQuery } from '@tanstack/react-query'
+import { Form, Input, Button, List, Typography, Collapse, message, Popconfirm } from 'antd'
+import { PlusOutlined, UserOutlined, MailOutlined, PhoneOutlined, IdcardOutlined, TeamOutlined, DeleteOutlined } from '@ant-design/icons'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getAdminProfile } from '../../react query/api/profile'
-import { addDeparment, getAllDepartments,getAllCourses , addCourse } from '../../react query/api/departments'
+import { addDeparment, getAllDepartments, getAllCourses, addCourse, removeDepartment, removeCourse } from '../../react query/api/departments'
 
 const { Title, Text } = Typography
 const { Panel } = Collapse
 
 export default function Profile() {
-  // const [admin, setAdmin] = useState(initialAdmin)
-  // const [departments, setDepartments] = useState(['HR', 'IT', 'Finance'])
-  const [departments  ,setDepartments] = useState([])
-  const [courses  , setCourses] = useState([])
+  const [departments, setDepartments] = useState([])
+  const [courses, setCourses] = useState([])
   const [form] = Form.useForm()
   const [form2] = Form.useForm()
-  const {data:admin , isLoading:adminLoading , isSuccess:isSuccessDepartment} = useQuery({
-    queryFn:getAdminProfile,
-    queryKey:['getAdminProfile'],
+  const queryClient = useQueryClient()
 
+  const { data: admin, isLoading: adminLoading } = useQuery({
+    queryFn: getAdminProfile,
+    queryKey: ['getAdminProfile'],
   })
-  const {data:fetchedDepartments , isLoading:departmentLoadig} = useQuery({
-    queryFn:getAllDepartments,
-    queryKey:['getAllDepartments']
 
+  const { data: fetchedDepartments, isLoading: departmentLoading, isSuccess: isSuccessDepartment } = useQuery({
+    queryFn: getAllDepartments,
+    queryKey: ['getAllDepartments'],
   })
-  const {data:fetchedCourses , isLoading:courseLoadig , isSuccess:isSuccessCourse} = useQuery({
-    queryFn:getAllCourses,
-    queryKey:['getAllCourses']
 
+  const { data: fetchedCourses, isLoading: courseLoading, isSuccess: isSuccessCourse } = useQuery({
+    queryFn: getAllCourses,
+    queryKey: ['getAllCourses'],
   })
+
   const departmentMutation = useMutation({
-    mutationFn:addDeparment,
-  mutationKey:"addDepartment",
-  onSuccess:(data) =>{
-    setDepartments([...departments , data])
-  }
-  
-    })
-    
-  const coursetMutation = useMutation({
-  mutationFn:addCourse,
-mutationKey:"addCourse",
-onSuccess:(data) =>{
-  setCourses([...courses, data])
-}
+    mutationFn: addDeparment,
+    onSuccess: (data) => {
+      setDepartments([...departments, data])
+      queryClient.invalidateQueries(['getAllDepartments'])
+    },
+  })
 
+  const courseMutation = useMutation({
+    mutationFn: addCourse,
+    onSuccess: (data) => {
+      setCourses([...courses, data])
+      queryClient.invalidateQueries(['getAllCourses'])
+    },
+  })
+
+  const removeDepartmentMutation = useMutation({
+    mutationFn: removeDepartment,
+    onSuccess: (_, variables) => {
+      setDepartments(departments.filter(dept => dept.id !== variables.id))
+      queryClient.invalidateQueries(['getAllDepartments'])
+      message.success('Department removed successfully')
+    },
+    onError: () => {
+      message.error('Failed to remove department')
+    },
+  })
+
+  const removeCourseMutation = useMutation({
+    mutationFn: removeCourse,
+    onSuccess: (_, variables) => {
+      setCourses(courses.filter(course => course.id !== variables.id))
+      queryClient.invalidateQueries(['getAllCourses'])
+      message.success('Course removed successfully')
+    },
+    onError: () => {
+      message.error('Failed to remove course')
+    },
   })
 
   useEffect(() => {
     if (isSuccessDepartment && fetchedDepartments) {
-      setDepartments(fetchedDepartments); // Set the fetched departments only once after successful data fetch
+      setDepartments(fetchedDepartments)
     }
-   
-  }, [isSuccessDepartment, fetchedDepartments]);
-  useEffect(() => {
-    if(isSuccessCourse && fetchedCourses) setCourses(fetchedCourses)
-   
-  }, [isSuccessCourse , fetchedCourses]);
+  }, [isSuccessDepartment, fetchedDepartments])
 
+  useEffect(() => {
+    if (isSuccessCourse && fetchedCourses) {
+      setCourses(fetchedCourses)
+    }
+  }, [isSuccessCourse, fetchedCourses])
 
   const handleAddDepartment = (values) => {
     departmentMutation.mutate(values)
     form.resetFields()
-
-   
     message.success('Department added successfully')
   }
-  const handleAddCourse = (value) =>{
-    coursetMutation.mutate(value)
+
+  const handleAddCourse = (values) => {
+    courseMutation.mutate(values)
     form2.resetFields()
+    message.success('Course added successfully')
   }
+
+  const handleRemoveDepartment = (id) => {
+    removeDepartmentMutation.mutate( id )
+  }
+
+  const handleRemoveCourse = (id) => {
+    removeCourseMutation.mutate( id )
+  }
+
+  if (adminLoading || departmentLoading || courseLoading) {
+    return <PageSkeleton />
+  }
+
   return (
-    <>
-    { adminLoading && departmentLoadig ?<PageSkeleton />  :<div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white shadow rounded-lg p-6 mb-6">
           <Title level={2} className="mb-6">Admin Profile</Title>
@@ -133,13 +166,25 @@ onSuccess:(data) =>{
               bordered
               dataSource={departments}
               renderItem={(item) => (
-                <List.Item>
+                <List.Item
+                  actions={[
+                    <Popconfirm
+                      title="Are you sure you want to delete this department?"
+                      onConfirm={() => handleRemoveDepartment(item.id)}
+                      okText="Yes"
+                      cancelText="No"
+                    >
+                      <Button icon={<DeleteOutlined />} danger>Delete</Button>
+                    </Popconfirm>
+                  ]}
+                >
                   <Text>{item.name}</Text>
                 </List.Item>
               )}
             />
           </Panel>
         </Collapse>
+
         <Collapse className="bg-white shadow rounded-lg overflow-hidden mb-6">
           <Panel header="Manage Courses" key="1">
             <Form form={form2} onFinish={handleAddCourse} layout="inline" className="mb-4">
@@ -159,7 +204,18 @@ onSuccess:(data) =>{
               bordered
               dataSource={courses}
               renderItem={(item) => (
-                <List.Item>
+                <List.Item
+                  actions={[
+                    <Popconfirm
+                      title="Are you sure you want to delete this course?"
+                      onConfirm={() => handleRemoveCourse(item.id)}
+                      okText="Yes"
+                      cancelText="No"
+                    >
+                      <Button icon={<DeleteOutlined />} danger>Delete</Button>
+                    </Popconfirm>
+                  ]}
+                >
                   <Text>{item.name}</Text>
                 </List.Item>
               )}
@@ -168,8 +224,5 @@ onSuccess:(data) =>{
         </Collapse>
       </div>
     </div>
-    }
-    </>
-  
   )
 }

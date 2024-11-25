@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { getCompanyApplication } from '../../react query/api/company';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getCompanyApplication, updateCompanyStatus } from '../../react query/api/company';
 import { 
   Layout, Typography, Card, Row, Col, Statistic, Tag, Descriptions, 
-  Avatar, Divider, List, Collapse, Spin, Alert 
+  Avatar, Divider, List, Collapse, Spin, Alert, Switch, message
 } from 'antd';
 import {
   BuildOutlined as BuildingOutlined, CalendarOutlined, DollarOutlined, TeamOutlined,
@@ -18,10 +18,33 @@ const { Panel } = Collapse;
 
 const CompanyDetails = () => {
   const { id: companyId } = useParams();
+  const queryClient = useQueryClient();
+  const [status , setStatus] = useState()
+
   const { data: company, isLoading, isError } = useQuery({
     queryKey: ['companyApplication', companyId],
     queryFn: () => getCompanyApplication(companyId),
   });
+  useEffect(()=>{
+    const {applicationStatus } = company || {}
+    company && setStatus(applicationStatus)
+  } ,[company])
+
+  const updateStatusMutation = useMutation({
+    mutationFn: updateCompanyStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['companyApplication', companyId]);
+      message.success('Company status updated successfully');
+      setStatus((status)=> !status)
+    },
+    onError: () => {
+      message.error('Failed to update company status');
+    },
+  });
+
+  const handleStatusChange = (checked) => {
+    updateStatusMutation.mutate({ id: companyId, status: checked });
+  };
 
   if (isLoading) {
     return (
@@ -42,14 +65,11 @@ const CompanyDetails = () => {
     );
   }
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Active': return 'green';
-      case 'Upcoming': return 'blue';
-      case 'Completed': return 'gray';
-      default: return 'default';
-    }
-  };
+ 
+
+  //const getStatusColor = (status) => {
+  //  return status ? 'green' : 'red';
+  //};
 
   return (
     <Layout className="min-h-screen bg-gray-100">
@@ -66,9 +86,17 @@ const CompanyDetails = () => {
               </div>
             </Col>
             <Col xs={24} sm={12} md={6} className="text-right">
-              <Tag color={getStatusColor(company.status)} className="text-lg px-4 py-1">
-                {company.status}
-              </Tag>
+              <div className="flex items-center justify-end">
+                <Switch
+                  checked={status}
+                  onChange={handleStatusChange}
+                  loading={updateStatusMutation.isLoading}
+                  className="mr-2"
+                />
+                <Tag color={status ? 'green' : 'red'} className="text-lg px-4 py-1">
+                  {status ? 'Active' : 'Inactive'}
+                </Tag>
+              </div>
             </Col>
           </Row>
 

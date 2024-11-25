@@ -13,7 +13,15 @@ const getAllCourses = async() =>{
     return courses
 }
 
+const deleteCourse = async(user:any , id:number) =>{
+
+    const response  = await prisma.course.delete({where:{id:id}})
+    return response
+}
+
+
 export const CourseService = {
     addCourse,
-    getAllCourses
+    getAllCourses,
+    deleteCourse
 }

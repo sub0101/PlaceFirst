@@ -12,6 +12,7 @@ export interface IUserSignUp {
     password:string
     confirmPassword:string
     contact:string
+    otp:string
 }
 export interface IJwtPayload {
     userId:string

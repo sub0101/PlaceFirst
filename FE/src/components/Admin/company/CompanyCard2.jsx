@@ -7,8 +7,8 @@ import { getUserInfo } from '../../../utils/auth/getUserInfo';
 const { Text, Title } = Typography;
 
 export default function CompanyCard2({ company }) {
-  const { companyApplication, name: title, industry: type, date} = company;
-  const { applicants, id: companyId, ctc } = companyApplication;
+  const { companyApplication, name: title, industry: type, date,applicants} = company;
+  const {  id: companyId, ctc } = companyApplication;
   const navigate = useNavigate();
   const { id } = getUserInfo();
   const status =  companyApplication.status;

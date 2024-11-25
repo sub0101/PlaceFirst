@@ -3,6 +3,7 @@ import { catchAsync } from "../../../utils/ayncError";
 import { AuthService } from "./auth.service";
 import sendResponse from "../../../Shared/sendResponse";
 import { IUserResponse } from "../../../interfaces";
+import { sendOtp } from "./auth.helper";
 
 const signupStudent = catchAsync( async (req:Request , res:Response) => {
 
@@ -44,10 +45,22 @@ const response:IUserResponse  = await AuthService.login(req.body)
     
 
 })
+const sendOTP = catchAsync(async(req:Request , res:Response) =>{
+    console.log('send otp') 
+    
+    const response =  await sendOtp(req.body.email , req.body.enrollment)
+    sendResponse<any>(res , {
+        statusCode:200 , 
+        success: true,
+        message: "sucessfully sent otp",
+        data: response
+    })
+})
 
 
 export const AuthController = {
 signupStudent,
 signupAdmin,
-login
+login,
+sendOTP
 }

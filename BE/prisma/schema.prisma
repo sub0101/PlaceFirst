@@ -40,8 +40,9 @@ model Student {
   departmentId Int?
   department   Department? @relation(fields: [departmentId], references: [id])
   debarred     Boolean?    @default(false)
-  status       Boolean?    @default(false)
-  applicant    Applicant[]
+ placementStatus Json?
+  // applicant    Applicant[]
+
   education    Education[]
 }
 
@@ -86,32 +87,35 @@ model CompanyApplication {
   bondPeriod          String?
   openRoles           Int
   selectionProcess    String
-  applicants          Applicant[]
+  // applicants          Applicant[]
+  deadline String?
   interviewDate       String?
   pptDate             String?
   assessmentDate      String?
-  tier                String?
-  status Boolean?
+  tier                Tier?
+  status Boolean? @default(true)
+  applicationStatus Boolean @default(true)
+ 
   allowedCourses      String[]
   allowedBranches     String[]
   createdAt           DateTime    @default(now())
   updatedAt           DateTime    @updatedAt
 }
 
-model Applicant {
-  id                   Int                @id @default(autoincrement())
-  studentId            String
-  Student              Student            @relation(fields: [studentId], references: [id])
-  companyApplicationId String
-  CompanyApplication   CompanyApplication @relation(fields: [companyApplicationId], references: [id])
-  backlog              Boolean?           @default(false)
-  cgpa                 Int?
-  precentage           Int?
-  resumeUrl            String?
-  status               String? @default("applied")
-  appliedAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
-}
+// model Applicant {
+//   id                   Int                @id @default(autoincrement())
+//   studentId            String
+//   Student              Student            @relation(fields: [studentId], references: [id])
+//   companyApplicationId String
+//   CompanyApplication   CompanyApplication @relation(fields: [companyApplicationId], references: [id])
+//   backlog              Boolean?           @default(false)
+//   cgpa                 Int?
+//   precentage           Int?
+//   resumeUrl            String?
+//   status               String? @default("applied")
+//   appliedAt            DateTime           @default(now())
+//   updatedAt            DateTime           @updatedAt
+// }
 
 model Education {
   id               Int      @id @default(autoincrement())
@@ -135,4 +139,17 @@ model Course {
   id      Int       @id @default(autoincrement())
   name    String
   student Student[]
+}
+model OTP {
+  id        Int      @id @default(autoincrement())
+  email String
+  code      String @unique
+  createdAt DateTime @default(now())
+}
+
+
+enum Tier {
+DREAM
+STANDARD
+NORMAL
 }

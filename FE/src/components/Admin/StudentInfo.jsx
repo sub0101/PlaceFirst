@@ -1,21 +1,63 @@
 'use client'
 
-import React from 'react'
-import { Card, Descriptions, Table, Tag, Typography, Spin, Empty } from 'antd'
-import { UserOutlined, BookOutlined, BankOutlined } from '@ant-design/icons'
-import { useQuery } from '@tanstack/react-query'
+import React, { useState } from 'react'
+import { Card, Descriptions, Table, Tag, Typography, Spin, Empty, Switch, Modal } from 'antd'
+import { UserOutlined, BookOutlined, BankOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
 import { getStudentInfo } from '../../react query/api/profile'
 
 const { Title } = Typography
+const { confirm } = Modal
 
 export default function StudentInfo() {
   const { id: studentId } = useParams()
+  const queryClient = useQueryClient()
   
   const { data: studentInfo, isError, isLoading } = useQuery({
     queryFn: () => getStudentInfo(studentId),
     queryKey: ['studentInfo', studentId]
   })
+
+  const updateStatusMutation = useMutation({
+    // mutationFn: updateStudentStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['studentInfo', studentId])
+    },
+  })
+
+  const updateDebarredMutation = useMutation({
+    // mutationFn: updateStudentDebarred,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['studentInfo', studentId])
+    },
+  })
+
+  const showConfirm = (title, content, onOk) => {
+    confirm({
+      title,
+      icon: <ExclamationCircleOutlined />,
+      content,
+      onOk,
+      onCancel() {},
+    })
+  }
+
+  const handleStatusChange = (checked) => {
+    showConfirm(
+      'Change Student Status',
+      `Are you sure you want to ${checked ? 'activate' : 'deactivate'} this student?`,
+      () => updateStatusMutation.mutate({ studentId, status: checked })
+    )
+  }
+
+  const handleDebarredChange = (checked) => {
+    showConfirm(
+      'Change Debarred Status',
+      `Are you sure you want to ${checked ? 'debar' : 'un-debar'} this student?`,
+      () => updateDebarredMutation.mutate({ studentId, debarred: checked })
+    )
+  }
 
   const educationColumns = [
     { title: 'Degree', dataIndex: 'degree', key: 'degree' },
@@ -89,10 +131,20 @@ export default function StudentInfo() {
             <Descriptions.Item label="Course">{studentInfo.course?.name || 'Not specified'}</Descriptions.Item>
             <Descriptions.Item label="Department">{studentInfo.department?.name || 'Not specified'}</Descriptions.Item>
             <Descriptions.Item label="Status">
-              {studentInfo.status ? <Tag color="green">Active</Tag> : <Tag color="red">Inactive</Tag>}
+              <Switch
+                checked={studentInfo.status}
+                onChange={handleStatusChange}
+                checkedChildren="Active"
+                unCheckedChildren="Inactive"
+              />
             </Descriptions.Item>
             <Descriptions.Item label="Debarred">
-              {studentInfo.debarred ? <Tag color="red">Yes</Tag> : <Tag color="green">No</Tag>}
+              <Switch
+                checked={studentInfo.debarred}
+                onChange={handleDebarredChange}
+                checkedChildren="Yes"
+                unCheckedChildren="No"
+              />
             </Descriptions.Item>
             <Descriptions.Item label="Backlog">
               {studentInfo.backlog ? <Tag color="red">Yes</Tag> : <Tag color="green">No</Tag>}
@@ -111,9 +163,6 @@ export default function StudentInfo() {
                 </a>
               </Descriptions.Item>
             )}
-            <Descriptions.Item label="Applied At" span={2}>
-              {studentInfo.appliedAt ? new Date(studentInfo.appliedAt).toLocaleString() : 'Not available'}
-            </Descriptions.Item>
           </Descriptions>
         </Card>
         

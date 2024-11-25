@@ -6,13 +6,15 @@ import { AuthUser } from "../../../../enums"
 import { app } from "../../../../app"
 import mongoose from "mongoose"
 import { Model } from "mongoose"
-import { formSchema } from "../../../../config/database"
+import { ApplicantModel, CustomFormModel } from "../../../../config/database"
+
+import { canApply, getApplicants } from "./comapny.helper"
+import { JsonArray } from "@prisma/client/runtime/library"
 
 const addForm = async(payload:any , id:string)=>{
     console.log("adding applicant")
     console.log(payload)
     console.log(id)
-    const CustomFormModel:Model<any> = mongoose.model('CustomForm' , formSchema)
    
     const form = new CustomFormModel({
         companyApplicationId:id,
@@ -23,7 +25,6 @@ const addForm = async(payload:any , id:string)=>{
     return form
 }
 const getForm = async()=>{
-    const CustomFormModel:Model<any> = mongoose.model('CustomForm' , formSchema)
 
 const response:any =  await CustomFormModel.find({})
 console.log(response)
@@ -64,19 +65,21 @@ const getAllCompanies = async (user:any):Promise<Company[]> => {
    
     const data = await prisma.company.findMany({
         include:{
-            companyApplication:{
-                include:{
-                    applicants:{
-                       select:{
-                        id:true
-                       }
-                    }
-                }
-            }
+            companyApplication:true
         }
     })
+    const updatedData = await Promise.all(
+        data.map(async (company: any) => {
+            const applicants = await getApplicants(company.companyApplication.id);
+            return {
+                ...company,
 
-    return data
+                applicants: applicants
+            };
+        })
+    );
+
+    return updatedData
 
 
 }
@@ -105,7 +108,7 @@ const updateCompany = async (user:any , payload:any) => {
             companyApplication:true
         }
     })
-    console.log(response)
+
     return response;
     
 }
@@ -119,33 +122,30 @@ const getAllApplications = async(user:any )=>{
           industry: true,
           visitDate: true,
           location: true,
-          companyApplication: {
-          
-            include:{
-            
-                applicants:{
-                    where:{
-                        studentId:id
-                    },
-                    select:{
-                        studentId:true
-                        
-                    },
-                    
-                },
-                _count:{
-                    select:{
-                        applicants:true
-                    }
-                }
-            }
-          }
+          companyApplication: true
         
         }
       })
+    //   const student = await prisma.student.findUnique({where:{id:id}})
+    //   const placementStatus:any= student?.placementStatus || [];
+
+    // !placementStatus?.some((item: any) => console.log(item));
+// const canApply  = canApply(id , )
+      const updatedData = await Promise.all(
+        data.map(async (company: any) => {
+            const applicants = await getApplicants(company.companyApplication.id);
+            return {
+                ...company,
+                applicants: applicants,
+                canApply :( await canApply(id , company.companyApplication.tier ,applicants)) && company.companyApplication.applicationStatus 
+            };
+        })
+    );
+    
+    console.log(updatedData);
       
     
-return data
+return updatedData
 }
 
 const getApplication = async(user:any, comapnyId:string) =>{
@@ -171,8 +171,8 @@ const getApplication = async(user:any, comapnyId:string) =>{
                 }
                 
             },
-            applicants:is_admin,
-            _count:true
+            // applicants:is_admin,
+            // _count:true
         }
     })
     const {company , ...companyApplication}:any = application
@@ -185,6 +185,50 @@ const getApplication = async(user:any, comapnyId:string) =>{
     return response
 }
 
+export const updateStatus  = async(user:any , payload:any) =>{
+    const {id,  status} = payload
+    const updateCompany = await prisma.companyApplication.update({
+        where:{
+            id:id
+        },
+        data:{
+            applicationStatus:status
+        }
+    })
+}
+
+const getApplied = async(user:any) =>{
+    const {id } =user;
+    const student = await prisma.student.findUnique({
+        where:{
+            id:id
+        }
+    })
+    const applicant = await ApplicantModel.find({studentId:id})
+
+   const companyApplications =  await Promise.all( applicant.map( async (applicant) =>{
+        const companyApplication = await prisma.companyApplication.findUnique({
+            where:{
+                id:applicant?.companyApplicationId
+            },
+            include:{
+                company:{
+                    select:{
+                        name:true,
+                        location:true
+                    }
+                }
+            }
+        })
+        return { applicant, ...companyApplication } ;
+    })
+)
+    
+    
+    console.log(  companyApplications)
+    return companyApplications;
+    
+}
 
 export const CompanyService = {
     addCompany,
@@ -194,5 +238,7 @@ export const CompanyService = {
     getAllApplications,
     getApplication,
     addForm,
-    getForm
+    getForm,
+    updateStatus,
+    getApplied
 }

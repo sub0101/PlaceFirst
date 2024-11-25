@@ -1,7 +1,7 @@
 import { Admin, Auth, Student } from "@prisma/client"
 import prisma from "../../../Shared/prisma"
 import { IUserResponse, IUserSignUp } from "../../../interfaces"
-import { AuthHelper } from "./auth.helper"
+import { AuthHelper, verifyStudent } from "./auth.helper"
 import { compare } from "bcrypt"
 import jwt from "jsonwebtoken"
 import env from "../../../config"
@@ -10,6 +10,8 @@ import { hashPassword } from "../../../utils/bcrypt"
 import { userInfo } from "os"
 import { generateAceessToken } from "../../../utils/jwt"
 import { AuthUser } from "../../../enums"
+import { mailSender } from "../../../utils/mailer"
+import { registerd_body } from "../../../Shared/mailsBody"
 
 const login = async (payload: { userId: string, password: string }):Promise<IUserResponse> => {
     let  { userId, password } = payload;
@@ -43,17 +45,24 @@ const login = async (payload: { userId: string, password: string }):Promise<IUse
     }
     return response
 
-
-
 }
 const signupStudent = async (payload: IUserSignUp) => {
 
-    let { name, userId, email, password ,contact} = payload
+    let { name, userId, email, password ,contact,otp} = payload
 
-userId = userId.toLocaleLowerCase()
+       if( !verifyStudent(userId) ) throw new ApiError(401, "User Does Not Registered to MIS")
+
+
+    userId = userId.toLocaleLowerCase()
     await AuthHelper.isUserExist(userId, email)
     const hpassword = await hashPassword(password);
+const validOtp = await  prisma.oTP.findMany({where:{
+    email:email
+}})
+if(!validOtp) throw new ApiError( 401 , "OTp is Invalid")
+if(validOtp[0].code != otp) throw new ApiError( 401 , "OTP is Invalid")
 
+prisma.oTP.deleteMany({where:{email:email}})
     const trasaction  = await prisma.$transaction(async (tx) => {
 
         const auth = await tx.auth.create({
@@ -74,6 +83,7 @@ userId = userId.toLocaleLowerCase()
             }
         })
     })
+    mailSender(email , 'Account Successfully Registered' , registerd_body(name , "PlaceTrack"))
 }
 const signupAdmin = async (payload: IUserSignUp) => {
     let  { name, userId, email, password ,contact} = payload

@@ -13,7 +13,7 @@ export const app = express();
 app.use(cors({origin:["http://localhost:5173" ,'https://place-first.vercel.app'],
     optionsSuccessStatus: 200,
     preflightContinue: false,
-    methods: "GET,POST,OPTIONS,PATCH",
+    methods: "GET,POST,OPTIONS,PATCH,DELETE",
     credentials: true}))
 app.use(express.json())
 app.use(urlencoded({extended:true}))

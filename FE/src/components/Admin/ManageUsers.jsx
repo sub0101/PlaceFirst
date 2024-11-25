@@ -42,6 +42,8 @@ export default function ManageUsers() {
  result = filterKeys(result)
     exportToExcel(result, "Users");
   }
+  
+  
   useEffect(() => {
     if (students) {
       const filtered = students.filter(student => 
@@ -66,12 +68,12 @@ export default function ManageUsers() {
     },
     { title: 'Enrollment', dataIndex: 'studentId', key: 'studentId' },
     { title: 'Course', dataIndex: 'course', key: 'course', render:(text ,value)=> {
-      return value.course.name
+      return value.course?.name
       } },
     { title: 'Department', dataIndex: ['department', 'name'], key: 'department' ,
 
       render:(text ,value)=> {
-      return value.department.name
+      return value.department?.name
       }
     },
     { title: 'Email', dataIndex: 'email', key: 'email' },
@@ -80,8 +82,10 @@ export default function ManageUsers() {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => {
-        const color = status ? "green" : "red";
+      render: (text3 ,data) => {
+        // console.log(data.placementStatus)
+        const status = data.placementStatus ?true:false;
+        const color =status ? "green" : "red";
         const text = status ? "Placed" : "Not Placed";
         return <Tag color={color}>{text}</Tag>;
       },

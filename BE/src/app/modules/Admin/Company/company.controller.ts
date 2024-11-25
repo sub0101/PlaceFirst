@@ -3,7 +3,7 @@ import ApiError from "../../../../Error/ApiError"
 import { catchAsync } from "../../../../utils/ayncError"
 import { Request , Response } from "express"
 import sendResponse from "../../../../Shared/sendResponse"
-import { CompanyService } from "./company.service"
+import { CompanyService, updateStatus } from "./company.service"
 import { Company, CompanyApplication } from "@prisma/client"
 
 const getAllCompanies= catchAsync(async (req , res) =>{
@@ -79,6 +79,26 @@ const getForm = catchAsync(async(req:Request , res:Response) =>{
         data:response
     })
 })
+const updateCompanyStatus = catchAsync(async (req:Request , res:Response) =>{
+
+    const response = await  CompanyService.updateStatus(req.user , req.body);
+    sendResponse<any>(res , {
+        statusCode:httpStatus.OK,
+        success:true,
+        message:"Successfully update Company Status",
+        data:response
+    })
+})
+
+const getApplied = catchAsync(async(req:Request , res:Response) =>{
+    const response  = await CompanyService.getApplied(req.user);
+    sendResponse<any>  (res , {
+        statusCode:httpStatus.OK,
+        success:true,
+        message:"Successfully fetch Company Application",
+        data:response
+    })
+})
 
 export const CompanyController = {
     getAllCompanies,
@@ -87,5 +107,7 @@ export const CompanyController = {
     getApplicationDetail,
     updateCompany,
     addForm,
-    getForm
+    getForm,
+    updateCompanyStatus,
+    getApplied
 }

@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import prisma from "../../../../Shared/prisma";
 import { manageStats } from "./stats.helper";
 const getStats = async () => {
@@ -16,15 +17,18 @@ const getStats = async () => {
         select: {
           student: {
             where: {
-              status: true
+              // status: true
+              placementStatus:{
+                not:Prisma.JsonNullValueFilter.JsonNull,
+              }
             }
           }
         }
       }
     }
   });
-//   console.log(totalPlaced)
-//   console.log(totalStudent)
+  console.log(totalPlaced)
+  console.log(totalStudent)
  return  manageStats(totalPlaced, totalStudent)
 //  return {totalPlaced , totalStudent}
 };

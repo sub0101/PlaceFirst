@@ -15,3 +15,7 @@ export const updateApplicant = async(data) =>{
     console.log(response.data.data)
     return response.data.data
 }
+export const updateStatus = async(data) =>{
+    const resposne = await authAxios.patch(`${URL}/update-status`  ,data)
+return resposne.data.data
+}

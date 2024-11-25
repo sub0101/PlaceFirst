@@ -9,5 +9,6 @@ const router = express.Router()
 
 router.post('/' , isAuth(AuthUser.ADMIN), DepartmentController.addDeparment )
 router.get('/' , DepartmentController.getAllDepartments)
+router.delete('/:id' , isAuth(AuthUser.ADMIN) ,DepartmentController.deleteDepartment)
 
 export  const DepartmentRouter = router

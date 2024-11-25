@@ -7,6 +7,7 @@ const router = express.Router()
 
 router.get("/:id" , isAuth(AuthUser.ADMIN) , ApplicantsController.getApplicants)
 router.patch("/" , isAuth(AuthUser.ADMIN) , ApplicantsController.updateApplicant)
+router.patch('/update-status' , isAuth(AuthUser.ADMIN) , ApplicantsController.updateStatus)
 
 
 export const ApplicantRouter = router

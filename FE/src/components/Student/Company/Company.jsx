@@ -51,11 +51,12 @@ console.log(applications)
            
             <CompanyCard
               title={company.name}
-              status={company.companyApplication.status}
+              status={company.companyApplication.applicationStatus}
               type={company.industry}
               ctc={company.companyApplication.ctc}
               date={company.date}
-              applicants={company.companyApplication.applicants}
+              applicants={company.applicants}
+              canApply={!company.canApply}
               companyId={company.companyApplication.id}
             />
           </Col>

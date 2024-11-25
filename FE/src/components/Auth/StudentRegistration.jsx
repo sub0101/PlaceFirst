@@ -2,14 +2,28 @@ import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Form, Input, Button, message } from 'antd'
 import { UserOutlined, IdcardOutlined, MailOutlined, PhoneOutlined, LockOutlined } from '@ant-design/icons'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
-import { register } from '../../react query/api/auth'
+import { register, sendOtp } from '../../react query/api/auth'
 
 export default function StudentSignup() {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
-
+  const[formData , setFormData] = useState()
+  const navigate = useNavigate()
+  const otpMutation = useMutation({
+    mutationFn:sendOtp,
+    mutationKey:['otp'],
+    onError:(error)=>{
+      const err = error.response.data.message
+      message.error(err || 'Unable to send otp')
+    },
+    onSuccess:()=>{
+      message.success('otp sent Succefully')
+      navigate('/verify-otp' , { state: formData })
+      
+    }
+  })
   const registerMutation = useMutation({
     mutationFn: register,
     mutationKey: ["register"],
@@ -18,6 +32,7 @@ export default function StudentSignup() {
       message.success('Signup successful!')
       form.resetFields()
     },
+  
     onError: (error) => {
       // console.log(error)
             setLoading(false)
@@ -30,8 +45,13 @@ export default function StudentSignup() {
   })
 
   const onFinish = (values) => {
-    setLoading(true)
-    registerMutation.mutate(values)
+    // setLoading(true)
+    console.log(values.email)
+    const userId = values.userId
+    console.log(userId)
+    setFormData(values)
+    otpMutation.mutate( { email:values.email , id:userId})
+    // registerMutation.mutate(values)
   }
 
   return (

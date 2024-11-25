@@ -22,9 +22,19 @@ const getAllDepartments = catchAsync(async(req:Request , res:Response) =>{
         data:response
     })
 })
+const deleteDepartment = catchAsync(async (req:Request , res:Response) =>{
+    const response = await DepartmentService.deleteDepartment(req.user , Number(req.params.id))
+    sendResponse<any>(res , {
+        statusCode:httpStatus.OK,
+        success:true,
+        message:"Successfully deleted Department",
+        data:response
+    })
+})
 
 
 export const DepartmentController ={
     addDeparment,
-    getAllDepartments
+    getAllDepartments,
+    deleteDepartment
 }
