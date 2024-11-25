@@ -4,10 +4,11 @@ import { AuthController } from "./auth.controller"
 
 const router = express.Router()
 
+router.post('/otp' ,AuthController.sendOTP  )
+router.post("/login" , AuthController.login)
 router.post("/signup/student" , AuthController.signupStudent )
 router.post("/signup/admin" , AuthController.signupAdmin)
-router.post("/login" , AuthController.login)
-router.post('/otp' ,AuthController.sendOTP  )
+
 
 
 
