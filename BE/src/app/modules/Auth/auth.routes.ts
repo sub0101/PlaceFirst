@@ -7,7 +7,7 @@ const router = express.Router()
 router.post("/signup/student" , AuthController.signupStudent )
 router.post("/signup/admin" , AuthController.signupAdmin)
 router.post("/login" , AuthController.login)
-router.post('/send-otp' ,AuthController.sendOTP  )
+router.post('/otp' ,AuthController.sendOTP  )
 
 
 
