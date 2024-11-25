@@ -6,8 +6,8 @@ const manageStats = (totalPlaced, totalStudent) => {
     totalPlaced.map((item) => {
         result.push({
             id: item.id,
-            departmentName: item.name,
-            shortName: getShortName(item.name),
+            departmentName: (item.name).trim(),
+            shortName: getShortName((item.name).trim()),
             totalPlaced: item._count.student
         });
     });
@@ -21,9 +21,13 @@ exports.manageStats = manageStats;
 const getShortName = (name) => {
     const arr = name.split(' ');
     let shortName = "";
+    console.log(arr);
     arr.forEach((item) => {
-        if ((item.toLocaleLowerCase() !== "of".toLocaleLowerCase()) && item.toLocaleLowerCase() !== 'and'.toLocaleLowerCase())
-            shortName += item[0].toLocaleUpperCase();
+        var _a;
+        item = item.trim();
+        console.log(item);
+        if (((item === null || item === void 0 ? void 0 : item.toLocaleLowerCase()) !== "of".toLocaleLowerCase()) && (item === null || item === void 0 ? void 0 : item.toLocaleLowerCase()) !== 'and'.toLocaleLowerCase())
+            shortName += (_a = item[0]) === null || _a === void 0 ? void 0 : _a.toLocaleUpperCase();
     });
     // console.log(shortName)
     return shortName;

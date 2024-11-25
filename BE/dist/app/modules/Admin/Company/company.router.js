@@ -11,8 +11,12 @@ const enums_1 = require("../../../../enums");
 const router = express_1.default.Router();
 router.get("/", (0, Auth_1.isAuth)(enums_1.AuthUser.ADMIN), company_controller_1.CompanyController.getAllCompanies);
 router.get("/applications", (0, Auth_1.isAuth)(enums_1.AuthUser.STUDENT), company_controller_1.CompanyController.getAllApplications);
+router.get('/applied_companies', (0, Auth_1.isAuth)(enums_1.AuthUser.STUDENT), company_controller_1.CompanyController.getApplied);
 router.get('/:id', (0, Auth_1.isAuth)(enums_1.AuthUser.ADMIN, enums_1.AuthUser.STUDENT), company_controller_1.CompanyController.getApplicationDetail);
 router.post("/", (0, Auth_1.isAuth)(enums_1.AuthUser.ADMIN), company_controller_1.CompanyController.addCompany);
 router.patch('/', (0, Auth_1.isAuth)(enums_1.AuthUser.ADMIN), company_controller_1.CompanyController.updateCompany);
+router.post('/addForm', company_controller_1.CompanyController.addForm);
+router.post('/getForm', company_controller_1.CompanyController.getForm);
+router.patch('/status', (0, Auth_1.isAuth)(enums_1.AuthUser.ADMIN), company_controller_1.CompanyController.updateCompanyStatus);
 exports.CompanyRouter = router;
 //# sourceMappingURL=company.router.js.map

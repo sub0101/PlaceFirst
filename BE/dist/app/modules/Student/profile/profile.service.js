@@ -47,42 +47,47 @@ const updateProfile = (user, data) => __awaiter(void 0, void 0, void 0, function
     // console.log(user)
     const { studentInfo, education } = data;
     const { departmentId, department, courseId, course } = studentInfo, updateData = __rest(studentInfo, ["departmentId", "department", "courseId", "course"]);
-    console.log(updateData);
     const student = yield prisma_1.default.student.update({
         data: Object.assign(Object.assign({}, updateData), { departmentId: departmentId, courseId: courseId }),
         where: {
             id: user.id
         }
     });
-    // await prisma.education.create({
-    //     data: {
-    //         degree: 'Bachelor of Science',
-    //         institution: 'University X',
-    //         year:"1022",
-    //         currentEducation:false,
-    //         student: {
-    //           connect: { id: student.id }, 
-    //         },
-    //       }
-    // })
-    // if(education.length > 0) {
-    //     console.log(education)
-    //     await prisma.student.crea({
-    //         where:{
-    //             studentId:user.id
-    //         },
-    //         data:{
-    //            education:education
-    //         }
-    //     })
-    // }
+    if (education.length > 0) {
+        yield prisma_1.default.student.update({
+            where: { id: user.id },
+            data: {
+                education: {
+                    upsert: education.map((ed) => ({
+                        where: { id: ed.id || 0 },
+                        update: {
+                            degree: ed.degree,
+                            institution: ed.institution,
+                            year: ed.year,
+                            currentEducation: ed.currentEducation,
+                            grade: parseFloat(ed.grade),
+                            specialization: ed.specialization
+                        },
+                        create: {
+                            degree: ed.degree,
+                            institution: ed.institution,
+                            year: ed.year,
+                            currentEducation: ed.currentEducation,
+                            grade: parseFloat(ed.grade),
+                            specialization: ed.specialization
+                        },
+                    }))
+                },
+            }
+        });
+    }
     return student;
 });
 const getAllProfiles = () => __awaiter(void 0, void 0, void 0, function* () {
     const response = yield prisma_1.default.student.findMany({
         include: {
             department: true,
-            course: true
+            course: true,
         }
     });
     return response;
@@ -101,6 +106,14 @@ const getStudentInfo = (id) => __awaiter(void 0, void 0, void 0, function* () {
     if (!student)
         throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, "User Does not Exist");
     return student;
+});
+const deleteEducation = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const respone = yield prisma_1.default.education.delete({
+        where: {
+            id: id
+        }
+    });
+    return respone;
 });
 exports.S_ProfileService = {
     getProfile,

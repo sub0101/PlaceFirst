@@ -11,5 +11,6 @@ const enums_1 = require("../../../../enums");
 const router = express_1.default.Router();
 router.post('/', (0, Auth_1.isAuth)(enums_1.AuthUser.ADMIN), department_controller_1.DepartmentController.addDeparment);
 router.get('/', department_controller_1.DepartmentController.getAllDepartments);
+router.delete('/:id', (0, Auth_1.isAuth)(enums_1.AuthUser.ADMIN), department_controller_1.DepartmentController.deleteDepartment);
 exports.DepartmentRouter = router;
 //# sourceMappingURL=department.routes.js.map

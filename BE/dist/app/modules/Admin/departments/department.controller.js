@@ -35,8 +35,18 @@ const getAllDepartments = (0, ayncError_1.catchAsync)((req, res) => __awaiter(vo
         data: response
     });
 }));
+const deleteDepartment = (0, ayncError_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield deparments_service_1.DepartmentService.deleteDepartment(req.user, Number(req.params.id));
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Successfully deleted Department",
+        data: response
+    });
+}));
 exports.DepartmentController = {
     addDeparment,
-    getAllDepartments
+    getAllDepartments,
+    deleteDepartment
 };
 //# sourceMappingURL=department.controller.js.map

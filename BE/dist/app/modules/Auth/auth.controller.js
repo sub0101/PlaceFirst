@@ -16,6 +16,7 @@ exports.AuthController = void 0;
 const ayncError_1 = require("../../../utils/ayncError");
 const auth_service_1 = require("./auth.service");
 const sendResponse_1 = __importDefault(require("../../../Shared/sendResponse"));
+const auth_helper_1 = require("./auth.helper");
 const signupStudent = (0, ayncError_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const response = yield auth_service_1.AuthService.signupStudent(req.body);
     return (0, sendResponse_1.default)(res, {
@@ -47,9 +48,20 @@ const login = (0, ayncError_1.catchAsync)((req, res) => __awaiter(void 0, void 0
         data: response
     });
 }));
+const sendOTP = (0, ayncError_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('send otp');
+    const response = yield (0, auth_helper_1.sendOtp)(req.body.email, req.body.enrollment);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "sucessfully sent otp",
+        data: response
+    });
+}));
 exports.AuthController = {
     signupStudent,
     signupAdmin,
-    login
+    login,
+    sendOTP
 };
 //# sourceMappingURL=auth.controller.js.map

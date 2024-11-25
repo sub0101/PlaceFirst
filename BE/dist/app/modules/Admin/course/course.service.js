@@ -24,8 +24,13 @@ const getAllCourses = () => __awaiter(void 0, void 0, void 0, function* () {
     const courses = yield prisma_1.default.course.findMany();
     return courses;
 });
+const deleteCourse = (user, id) => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield prisma_1.default.course.delete({ where: { id: id } });
+    return response;
+});
 exports.CourseService = {
     addCourse,
-    getAllCourses
+    getAllCourses,
+    deleteCourse
 };
 //# sourceMappingURL=course.service.js.map

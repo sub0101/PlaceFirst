@@ -5,7 +5,7 @@ import { AuthController } from "./auth.controller"
 const router = express.Router()
 
 router.post('/otp' ,AuthController.sendOTP  )
-router.post("/loginn" , AuthController.login)
+router.post("/login" , AuthController.login)
 router.post("/signup/student" , AuthController.signupStudent )
 router.post("/signup/admin" , AuthController.signupAdmin)
 

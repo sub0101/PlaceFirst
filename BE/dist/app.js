@@ -32,11 +32,13 @@ const ApiError_1 = __importDefault(require("./Error/ApiError"));
 const routes_1 = __importDefault(require("./app/routes"));
 const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const mongoose_1 = __importDefault(require("mongoose"));
+const config_1 = __importDefault(require("./config"));
 exports.app = (0, express_1.default)();
 exports.app.use((0, cors_1.default)({ origin: ["http://localhost:5173", 'https://place-first.vercel.app'],
     optionsSuccessStatus: 200,
     preflightContinue: false,
-    methods: "GET,POST,OPTIONS,PATCH",
+    methods: "GET,POST,OPTIONS,PATCH,DELETE",
     credentials: true }));
 exports.app.use(express_1.default.json());
 exports.app.use((0, express_1.urlencoded)({ extended: true }));
@@ -53,4 +55,5 @@ exports.app.use((err, req, res, next) => {
         return res.status(500).json({ success: false, message: "something went Wrong" });
     }
 });
+mongoose_1.default.connect(config_1.default.DATABASEMONGO_URL).then(() => console.log("mongo db conected"));
 //# sourceMappingURL=app.js.map

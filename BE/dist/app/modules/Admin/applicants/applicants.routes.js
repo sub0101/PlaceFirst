@@ -10,5 +10,7 @@ const enums_1 = require("../../../../enums");
 const applicants_controller_1 = require("./applicants.controller");
 const router = express_1.default.Router();
 router.get("/:id", (0, Auth_1.isAuth)(enums_1.AuthUser.ADMIN), applicants_controller_1.ApplicantsController.getApplicants);
+router.patch("/", (0, Auth_1.isAuth)(enums_1.AuthUser.ADMIN), applicants_controller_1.ApplicantsController.updateApplicant);
+router.patch('/update-status', (0, Auth_1.isAuth)(enums_1.AuthUser.ADMIN), applicants_controller_1.ApplicantsController.updateStatus);
 exports.ApplicantRouter = router;
 //# sourceMappingURL=applicants.routes.js.map

@@ -15,7 +15,8 @@ const envSchema = zod_1.default.object({
     CLOUDINARY_NAME: zod_1.default.string(),
     CLOUDINARY_SECRET_KEY: zod_1.default.string(),
     CLOUDINARY_KEY: zod_1.default.string(),
-    ACCESS_TOKEN_SECRET: zod_1.default.string()
+    ACCESS_TOKEN_SECRET: zod_1.default.string(),
+    DATABASEMONGO_URL: zod_1.default.string().url()
 });
 const env = envSchema.parse(process.env);
 exports.default = env;

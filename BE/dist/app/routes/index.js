@@ -23,5 +23,6 @@ router.use("/applicants", applicants_routes_1.ApplicantRouter);
 router.use('/department', department_routes_1.DepartmentRouter);
 router.use('/course', course_routes_1.CourseRouter);
 router.use('/stats', stats_routes_1.StatsRouter);
+router.use('/form', company_router_1.CompanyRouter);
 exports.default = router;
 //# sourceMappingURL=index.js.map

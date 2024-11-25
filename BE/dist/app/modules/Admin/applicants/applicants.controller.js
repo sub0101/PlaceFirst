@@ -26,7 +26,28 @@ const getApplicants = (0, ayncError_1.catchAsync)((req, res) => __awaiter(void 0
         data: response
     });
 }));
+const updateApplicant = (0, ayncError_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // const params:string = req.params.id;
+    const response = yield applicants_service_1.ApplicantService.updateApplicant(req.body, req.body);
+    (0, sendResponse_1.default)(res, {
+        message: "Successfully feched Applicants",
+        success: true,
+        statusCode: 200,
+        data: response
+    });
+}));
+const updateStatus = (0, ayncError_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield applicants_service_1.ApplicantService.updateStatus(req.user, req.body);
+    (0, sendResponse_1.default)(res, {
+        message: "Successfully feched Applicants",
+        success: true,
+        statusCode: 200,
+        data: response
+    });
+}));
 exports.ApplicantsController = {
-    getApplicants
+    getApplicants,
+    updateApplicant,
+    updateStatus
 };
 //# sourceMappingURL=applicants.controller.js.map

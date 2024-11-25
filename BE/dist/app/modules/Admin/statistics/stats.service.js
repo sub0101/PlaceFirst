@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatsService = void 0;
+const client_1 = require("@prisma/client");
 const prisma_1 = __importDefault(require("../../../../Shared/prisma"));
 const stats_helper_1 = require("./stats.helper");
 const getStats = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -28,15 +29,18 @@ const getStats = () => __awaiter(void 0, void 0, void 0, function* () {
                 select: {
                     student: {
                         where: {
-                            status: true
+                            // status: true
+                            placementStatus: {
+                                not: client_1.Prisma.JsonNullValueFilter.JsonNull,
+                            }
                         }
                     }
                 }
             }
         }
     });
-    //   console.log(totalPlaced)
-    //   console.log(totalStudent)
+    console.log(totalPlaced);
+    console.log(totalStudent);
     return (0, stats_helper_1.manageStats)(totalPlaced, totalStudent);
     //  return {totalPlaced , totalStudent}
 });

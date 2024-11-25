@@ -11,5 +11,6 @@ const course_controller_1 = require("./course.controller");
 const router = express_1.default.Router();
 router.post('/', (0, Auth_1.isAuth)(enums_1.AuthUser.ADMIN), course_controller_1.CourseController.addCourse);
 router.get('/', course_controller_1.CourseController.getAllCourses);
+router.delete('/:id', (0, Auth_1.isAuth)(enums_1.AuthUser.ADMIN), course_controller_1.CourseController.deleteCourse);
 exports.CourseRouter = router;
 //# sourceMappingURL=course.routes.js.map

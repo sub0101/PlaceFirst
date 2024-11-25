@@ -24,8 +24,13 @@ const getAllDepartments = () => __awaiter(void 0, void 0, void 0, function* () {
     const departments = yield prisma_1.default.department.findMany();
     return departments;
 });
+const deleteDepartment = (user, id) => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield prisma_1.default.department.delete({ where: { id: id } });
+    return response;
+});
 exports.DepartmentService = {
     addDeparment,
-    getAllDepartments
+    getAllDepartments,
+    deleteDepartment
 };
 //# sourceMappingURL=deparments.service.js.map

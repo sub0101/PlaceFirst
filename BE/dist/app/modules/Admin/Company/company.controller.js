@@ -63,11 +63,51 @@ const updateCompany = (0, ayncError_1.catchAsync)((req, res) => __awaiter(void 0
         data: response
     });
 }));
+const addForm = (0, ayncError_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // const response  = await CompanyService.addForm(req.body) ;
+    // sendResponse<any>(res , {
+    //     statusCode:httpStatus.OK,
+    //     success:true,
+    //     message:"Successfully added Company Application",
+    //     data:response
+    // })
+}));
+const getForm = (0, ayncError_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield company_service_1.CompanyService.getForm();
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Successfully added Company Application",
+        data: response
+    });
+}));
+const updateCompanyStatus = (0, ayncError_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield company_service_1.CompanyService.updateStatus(req.user, req.body);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Successfully update Company Status",
+        data: response
+    });
+}));
+const getApplied = (0, ayncError_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield company_service_1.CompanyService.getApplied(req.user);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Successfully fetch Company Application",
+        data: response
+    });
+}));
 exports.CompanyController = {
     getAllCompanies,
     addCompany,
     getAllApplications,
     getApplicationDetail,
-    updateCompany
+    updateCompany,
+    addForm,
+    getForm,
+    updateCompanyStatus,
+    getApplied
 };
 //# sourceMappingURL=company.controller.js.map

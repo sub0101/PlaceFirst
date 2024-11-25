@@ -20,6 +20,8 @@ const ApiError_1 = __importDefault(require("../../../Error/ApiError"));
 const bcrypt_2 = require("../../../utils/bcrypt");
 const jwt_1 = require("../../../utils/jwt");
 const enums_1 = require("../../../enums");
+const mailer_1 = require("../../../utils/mailer");
+const mailsBody_1 = require("../../../Shared/mailsBody");
 const login = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     let { userId, password } = payload;
     console.log(payload);
@@ -52,10 +54,20 @@ const login = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     return response;
 });
 const signupStudent = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    let { name, userId, email, password, contact } = payload;
+    let { name, userId, email, password, contact, otp } = payload;
+    if (!(0, auth_helper_1.verifyStudent)(userId))
+        throw new ApiError_1.default(401, "User Does Not Registered to MIS");
     userId = userId.toLocaleLowerCase();
     yield auth_helper_1.AuthHelper.isUserExist(userId, email);
     const hpassword = yield (0, bcrypt_2.hashPassword)(password);
+    const validOtp = yield prisma_1.default.oTP.findMany({ where: {
+            email: email
+        } });
+    if (!validOtp)
+        throw new ApiError_1.default(401, "OTp is Invalid");
+    if (validOtp[0].code != otp)
+        throw new ApiError_1.default(401, "OTP is Invalid");
+    prisma_1.default.oTP.deleteMany({ where: { email: email } });
     const trasaction = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         const auth = yield tx.auth.create({
             data: {
@@ -74,6 +86,7 @@ const signupStudent = (payload) => __awaiter(void 0, void 0, void 0, function* (
             }
         });
     }));
+    (0, mailer_1.mailSender)(email, 'Account Successfully Registered', (0, mailsBody_1.registerd_body)(name, "PlaceTrack"));
 });
 const signupAdmin = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     let { name, userId, email, password, contact } = payload;
