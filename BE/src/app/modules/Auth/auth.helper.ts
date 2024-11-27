@@ -12,7 +12,7 @@ const isUserExist = async(user_id:string ,email:string)=>{
     const auth  = await prisma.auth.findFirst({
         where: {
             OR: [
-              { user_id: user_id },
+              { user_id: user_id.toLowerCase() },
               { email: email }
             ]
           }
@@ -22,14 +22,24 @@ const isUserExist = async(user_id:string ,email:string)=>{
     if(auth!=null) throw new ApiError(401 , "Email or Student Id is Already Exist")
         console.log("user not exist")
 }
+
+
+const isContactExist =  async(contact:string) =>{
+  const check  = await  prisma.student.findFirst({
+    where:{
+      contact:contact
+    }
+  })
+  if(check!=null) throw new ApiError(401 , "Contact is Already Exist")
+}
+
 export const sendOtp = async(email:string ,enrollment:string) =>
    {
     try {
      
-      // Check if user is already present
       if(!verifyStudent(enrollment)) throw new ApiError(401 , "User Not Registered to MIS")
-      const checkUserPresent = await prisma.student.findUnique({where:{email:email}})
-      if(checkUserPresent) throw new ApiError(401  ,"Uer Already Exist")
+   await  isUserExist(enrollment , email);
+    
      
       let otp = otpGenerator.generate(6, {
         upperCaseAlphabets: false,
@@ -54,15 +64,9 @@ export const sendOtp = async(email:string ,enrollment:string) =>
       console.log(otpBody)
       sendVerificationEmail(email , otp)
       
-      // throw new ApiError(200 , "OTP  sent Successfully")
-      // res.status(200).json({
-      //   success: true,
-      //   message: 'OTP sent successfully',
-      //   otp,
-      // });
+  
     } catch (error:any) {
       console.log(error.message);
-      // return res.status(500).json({ success: false, error: error.message });
       throw new ApiError(500 , error.message)
     }
     return "Successfully Sent OTP"

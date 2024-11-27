@@ -11,6 +11,7 @@ import {
   ClockCircleOutlined, BookOutlined, CheckCircleOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { getUserInfo } from '../../utils/auth/getUserInfo';
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -20,6 +21,7 @@ const CompanyDetails = () => {
   const { id: companyId } = useParams();
   const queryClient = useQueryClient();
   const [status , setStatus] = useState()
+  const userinfo  =getUserInfo()
 
   const { data: company, isLoading, isError } = useQuery({
     queryKey: ['companyApplication', companyId],
@@ -85,6 +87,7 @@ const CompanyDetails = () => {
                 </div>
               </div>
             </Col>
+            {userinfo.role==="admin" &&
             <Col xs={24} sm={12} md={6} className="text-right">
               <div className="flex items-center justify-end">
                 <Switch
@@ -98,6 +101,7 @@ const CompanyDetails = () => {
                 </Tag>
               </div>
             </Col>
+}
           </Row>
 
           <Row gutter={[16, 16]} className="mb-6">

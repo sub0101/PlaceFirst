@@ -37,8 +37,8 @@ export default function Applications() {
   const { data: applications = [], isError, isLoading } = useQuery({
     queryFn: getAppliedCompany,
     queryKey: ["getCompanies"],
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 10 * 60 * 1000, // 10 minutes
+    // staleTime: 5 * 60 * 1000, // 5 minutes
+    // cacheTime: 10 * 60 * 1000, // 10 minutes
   });
 
   const filteredApplications = useMemo(() => {
